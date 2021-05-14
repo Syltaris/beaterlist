@@ -1,10 +1,18 @@
-import React, { useState, useCallback } from "react";
-import { Table, Avatar, Heading, DragHandleHorizontalIcon } from "evergreen-ui";
+import React, { useState } from "react";
+import {
+  Table,
+  Avatar,
+  Heading,
+  Pane,
+  DragHandleHorizontalIcon,
+  FloppyDiskIcon,
+  Tooltip,
+} from "evergreen-ui";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 /*
 {
     "metadata":{
-            "difficulties":{"easy":false,"normal":true,"hard":true,"expert":true,"expertPlus":false},
+        "difficulties":{"easy":false,"normal":true,"hard":true,"expert":true,"expertPlus":false},
         "duration":0,
         "automapper":null,
         "characteristics":[
@@ -102,8 +110,45 @@ const DraggableRow = ({ type, idx, song }) => {
   );
 };
 
+const exportPlaylist = (image, title, author, songsList) => {
+  const bplistJson = {
+    image,
+    playlistTitle: title,
+    playlistAuthor: author,
+    songs: songsList.map((song) => ({
+      songName: song.metadata.name,
+      levelAuthorName: song.metadata.levelAuthorName,
+      hash: song.hash,
+      levelid: `custom_level_${song.hash}`,
+      difficulties: song.metadata.characteristics.flatMap((characteristic) =>
+        Object.entries(characteristic.difficulties)
+          .filter(([key, value]) => value !== null)
+          .map(([key, value]) => ({
+            characteristic: characteristic.name,
+            name: key,
+          }))
+      ),
+    })),
+  };
+
+  var element = document.createElement("a");
+  element.setAttribute(
+    "href",
+    "data:text/plain;charset=utf-8," +
+      encodeURIComponent(JSON.stringify(bplistJson))
+  );
+  element.setAttribute("download", `${title}.bplist`);
+
+  element.style.display = "none";
+  document.body.appendChild(element);
+
+  element.click();
+
+  document.body.removeChild(element);
+};
+
 // TODO: handle json types seperately
-const PlaylistTable = ({ title, author, songs }) => {
+const PlaylistTable = ({ image, title, author, songs }) => {
   const [songsList, setSongsList] = useState(songs);
 
   const onDragEnd = ({ destination, source }) => {
@@ -129,9 +174,17 @@ const PlaylistTable = ({ title, author, songs }) => {
 
   return (
     <>
-      <Heading margin={10}>
-        {title} - {author}
-      </Heading>
+      <Pane display="flex" flexDirection="row" alignItems="center">
+        {image && <Avatar src={"data:image/png;" + image} size={50} />}
+        <Heading margin={10}>
+          {title} - {author}
+        </Heading>
+        <Tooltip content="Download">
+          <FloppyDiskIcon
+            onClick={() => exportPlaylist(image, title, author, songsList)}
+          />
+        </Tooltip>
+      </Pane>
       <DragDropContext onDragEnd={onDragEnd}>
         <Table width="80%">
           <Table.Head height={42}>
