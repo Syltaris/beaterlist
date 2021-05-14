@@ -1,21 +1,72 @@
 import React from "react";
-import { Table } from "evergreen-ui";
+import { Table, Avatar, Heading } from "evergreen-ui";
 
-const bplistSongKeys = [
-  "songName",
-  "levelAuthorName",
-  "hash",
-  "levelid",
-  "difficulties",
-];
+/*
+{
+    "metadata":{
+            "difficulties":{"easy":false,"normal":true,"hard":true,"expert":true,"expertPlus":false},
+        "duration":0,
+        "automapper":null,
+        "characteristics":[
+            {
+                "name":"Standard",
+                "difficulties": {
+                    "easy":null,
+                    "normal":{"duration":355.7663269042969,"length":167,"bombs":334,"notes":375,"obstacles":9,"njs":10,"njsOffset":0},
+                    "hard":{"duration":355.7450866699219,"length":167,"bombs":306,"notes":480,"obstacles":3,"njs":10,"njsOffset":0},
+                    "expert":{"duration":355.7450866699219,"length":167,"bombs":138,"notes":662,"obstacles":3,"njs":10,"njsOffset":0},
+                    "expertPlus":null
+                }
+            }
+        ],
+        "songName":"Technologic",
+        "songSubName":"Daft Punk",
+        "songAuthorName":"Awfulnaut",
+        "levelAuthorName":"awfulnaut",
+        "bpm":127
+    },
+    "stats":{
+        "downloads":428745,
+        "plays":6632,
+        "downVotes":186,
+        "upVotes":9789,
+        "heat":120.6632514,
+        "rating":0.9512470277249632
+    },
+    "description":"Expert / Hard / Normal",
+    "deletedAt":null,
+    "_id":"5cff620e48229f7d88fc67a8",
+    "key":"747",
+    "name":"Technologic - Daft Punk (Update)",
+    "uploader":{"_id":"5cff0b7398cc5a672c84edac","username":"awfulnaut"},
+    "uploaded":"2018-06-30T18:30:38.000Z",
+    "hash":"831247d7d02e948e5d03622748bb130b5057023d",
+    "directDownload":"/cdn/747/831247d7d02e948e5d03622748bb130b5057023d.zip",
+    "downloadURL":"/api/download/key/747",
+    "coverURL":"/cdn/747/831247d7d02e948e5d03622748bb130b5057023d.jpg"
+}
+*/
 
-const getColText = (key, col) => {
-  if (col && key == "difficulties") {
-    return col.map((c) => c.name).join(",");
-  } else if (typeof col == "string") {
-    return col;
+const bplistSongKeys = ["name", "description", "difficulties"];
+
+const getColText = (key, song) => {
+  // special cases
+  switch (key) {
+    case "difficulties":
+      return Object.entries(song.metadata.difficulties)
+        .filter(([key, value]) => value)
+        .map(([key, _]) => key)
+        .join(",");
+    default:
+      break;
   }
-  return "col";
+
+  // very dirty way to parse out the relevant col data
+  if (key in song) {
+    return song[key];
+  } else if (key in song.metadata) {
+    return song.metadata[key];
+  }
 };
 
 const camelCaseToWords = (text) => {
@@ -25,27 +76,34 @@ const camelCaseToWords = (text) => {
 };
 
 // TODO: handle json types seperately
-const PlaylistTable = ({ type, playlist }) => (
-  <Table width="80%">
-    <Table.Head>
-      {bplistSongKeys.map((key) => (
-        <Table.HeaderCell key={key}>{camelCaseToWords(key)}</Table.HeaderCell>
-      ))}
-    </Table.Head>
-    <Table.Body minHeight={240}>
-      {playlist.songs.map((song) => (
-        <Table.Row
-          key={song.hash}
-          isSelectable
-          onSelect={() => alert(song.hash)}
-        >
-          {bplistSongKeys.map((key) => (
-            <Table.TextCell>{getColText(key, song[key])}</Table.TextCell>
-          ))}
-        </Table.Row>
-      ))}
-    </Table.Body>
-  </Table>
+const PlaylistTable = ({ playlist }) => (
+  <>
+    <Heading margin={10}>
+      {playlist.playlistTitle} - {playlist.playlistAuthor}
+    </Heading>
+    <Table width="80%">
+      <Table.Head height={42}>
+        <Table.HeaderCell flexBasis={60} flexGrow={0}>
+          Cover
+        </Table.HeaderCell>
+        {bplistSongKeys.map((key) => (
+          <Table.HeaderCell key={key}>{camelCaseToWords(key)}</Table.HeaderCell>
+        ))}
+      </Table.Head>
+      <Table.Body minHeight={240}>
+        {playlist.songs.map((song) => (
+          <Table.Row key={song.hash} isSelectable height={42}>
+            <Table.Cell flexBasis={60} flexGrow={0}>
+              <Avatar src={`https://beatsaver.com${song.coverURL}`} size={40} />
+            </Table.Cell>
+            {bplistSongKeys.map((key) => (
+              <Table.TextCell key={key}>{getColText(key, song)}</Table.TextCell>
+            ))}
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table>
+  </>
 );
 
 export default PlaylistTable;
