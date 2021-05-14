@@ -1,8 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Table, Avatar, Heading, DragHandleHorizontalIcon } from "evergreen-ui";
-import { DndProvider, useDrop, useDrag } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 /*
 {
     "metadata":{
@@ -77,88 +75,64 @@ const camelCaseToWords = (text) => {
   return finalResult;
 };
 
-const DraggableRow = ({ idx, song, moveRow }) => {
-  const dragRef = React.useRef(null);
-  const [{ isDragging }, drag, preview] = useDrag({
-    type: "TABLE_ROW",
-    item: { index: idx },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  });
-
-  const dropRef = React.useRef(null);
-  const [, drop] = useDrop({
-    accept: "TABLE_ROW",
-    hover(item, monitor) {
-      if (!dropRef.current) {
-        return;
-      }
-      const dragIndex = item.index;
-      const hoverIndex = idx;
-      // Don't replace items with themselves
-      if (dragIndex === hoverIndex) {
-        return;
-      }
-      // Determine rectangle on screen
-      const hoverBoundingRect = dropRef.current.getBoundingClientRect();
-      // Get vertical middle
-      const hoverMiddleY =
-        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
-      // Determine mouse position
-      const clientOffset = monitor.getClientOffset();
-      // Get pixels to the top
-      const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-      // Only perform the move when the mouse has crossed half of the items height
-      // When dragging downwards, only move when the cursor is below 50%
-      // When dragging upwards, only move when the cursor is above 50%
-      // Dragging downwards
-      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-        return;
-      }
-      // Dragging upwards
-      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-        return;
-      }
-      // Time to actually perform the action
-      moveRow(dragIndex, hoverIndex);
-      // Note: we're mutating the monitor item here!
-      // Generally it's better to avoid mutations,
-      // but it's good here for the sake of performance
-      // to avoid expensive index searches.
-      item.index = hoverIndex;
-    },
-  });
-
-  preview(drop(dropRef));
-  drag(dragRef);
-
+const DraggableRow = ({ type, idx, song }) => {
   return (
-    <div ref={dropRef} style={{ cursor: isDragging ? "move" : "pointer" }}>
-      <Table.Row ref={dragRef} key={song.hash} isSelectable height={42}>
-        <Table.Cell flexBasis={40} flexGrow={0}>
-          <DragHandleHorizontalIcon />
-        </Table.Cell>
-        <Table.Cell flexBasis={60} flexGrow={0}>
-          <Avatar src={`https://beatsaver.com${song.coverURL}`} size={40} />
-        </Table.Cell>
-        {bplistSongKeys.map((key) => (
-          <Table.TextCell key={key}>{getColText(key, song)}</Table.TextCell>
-        ))}
-      </Table.Row>
-    </div>
+    <Draggable key={song.hash} draggableId={song.hash} index={idx} type={type}>
+      {(provided, snapshot) => (
+        <Table.Row
+          key={song.hash}
+          isSelectable
+          height={42}
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          <Table.Cell flexBasis={40} flexGrow={0}>
+            <DragHandleHorizontalIcon />
+          </Table.Cell>
+          <Table.Cell flexBasis={60} flexGrow={0}>
+            <Avatar src={`https://beatsaver.com${song.coverURL}`} size={40} />
+          </Table.Cell>
+          {bplistSongKeys.map((key) => (
+            <Table.TextCell key={key}>{getColText(key, song)}</Table.TextCell>
+          ))}
+        </Table.Row>
+      )}
+    </Draggable>
   );
 };
 
 // TODO: handle json types seperately
 const PlaylistTable = ({ title, author, songs }) => {
   const [songsList, setSongsList] = useState(songs);
+
+  const onDragEnd = ({ destination, source }) => {
+    // the only one that is required
+    if (!destination || !source) {
+      return;
+    }
+
+    const destIdx = destination.index;
+    const sourceIdx = source.index;
+
+    // insert dragIdx item to hoverIdx position
+    setSongsList((list) => {
+      const listToUpdate = [...list];
+      const itemToInsert = listToUpdate[sourceIdx];
+      listToUpdate.splice(sourceIdx, 1);
+      listToUpdate.splice(destIdx, 0, itemToInsert);
+      return listToUpdate;
+    });
+  };
+
+  const TYPE = `${title}${author}`;
+
   return (
     <>
       <Heading margin={10}>
         {title} - {author}
       </Heading>
-      <DndProvider backend={HTML5Backend}>
+      <DragDropContext onDragEnd={onDragEnd}>
         <Table width="80%">
           <Table.Head height={42}>
             <Table.HeaderCell flexBasis={40} flexGrow={0} />
@@ -172,24 +146,19 @@ const PlaylistTable = ({ title, author, songs }) => {
             ))}
           </Table.Head>
           <Table.Body minHeight={240}>
-            {songsList.map((song, idx) => (
-              <DraggableRow
-                idx={idx}
-                song={song}
-                moveRow={(dragIdx, hoverIdx) => {
-                  // insert dragIdx item to hoverIdx position
-                  const listToUpdate = songsList;
-                  const itemToInsert = listToUpdate[dragIdx];
-                  listToUpdate.splice(dragIdx, 1);
-                  listToUpdate.splice(hoverIdx, 0, itemToInsert);
-                  console.log(dragIdx, hoverIdx, listToUpdate);
-                  setSongsList([...listToUpdate]);
-                }}
-              />
-            ))}
+            <Droppable droppableId={title} type={TYPE}>
+              {(provided, snapshot) => (
+                <div ref={provided.innerRef}>
+                  {songsList.map((song, idx) => (
+                    <DraggableRow type={TYPE} idx={idx} song={song} />
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
           </Table.Body>
         </Table>
-      </DndProvider>
+      </DragDropContext>
     </>
   );
 };
