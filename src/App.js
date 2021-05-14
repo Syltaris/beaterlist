@@ -114,6 +114,15 @@ class App extends React.Component {
           }}
         >
           <Pane minWidth="300px" padding={30}>
+            <Heading>Playlists Config</Heading>
+            <Checkbox
+              label="Horizontal Mode"
+              checked={horizontalMode}
+              onChange={(e) => {
+                this.setState({ horizontalMode: e.target.checked });
+              }}
+            />
+
             <Heading>Columns To Show</Heading>
             {bplistSongKeys.map((key) => (
               <Checkbox
@@ -134,10 +143,9 @@ class App extends React.Component {
           </Pane>
           <Pane
             width="100%"
-            height="100vh"
+            height="80vh"
             display="flex"
             flexDirection={horizontalMode ? "row" : "column"}
-            alignItems="center"
             //justifyContent="center"
             border="default"
             overflowX="scroll"
