@@ -91,9 +91,7 @@ class App extends React.Component {
         {playlists.map((playlist, idx) => (
           <PlaylistTable
             key={playlist.data.playlistTitle + idx}
-            image={playlist.data.image}
-            title={playlist.data.playlistTitle}
-            author={playlist.data.playlistAuthor}
+            playlist={playlist.data}
             songs={playlist.data.songs.map((song) => songCache[song.hash])}
           />
         ))}

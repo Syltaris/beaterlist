@@ -6,7 +6,9 @@ import {
   Pane,
   DragHandleHorizontalIcon,
   FloppyDiskIcon,
+  EditIcon,
   Tooltip,
+  TextInput,
 } from "evergreen-ui";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 /*
@@ -147,8 +149,33 @@ const exportPlaylist = (image, title, author, songsList) => {
   document.body.removeChild(element);
 };
 
+function openFileDialog(callback) {
+  // this function must be called from  a user
+  // activation event (ie an onclick event)
+
+  // Create an input element
+  var inputElement = document.createElement("input");
+  // Set its type to file
+  inputElement.type = "file";
+  // Set accept to the file types you want the user to select.
+  // Include both the file extension and the mime type
+  inputElement.accept = "image/*";
+  // Accept multiple files
+  inputElement.multiple = false;
+  // set onchange event to call callback when user has selected file
+  inputElement.addEventListener("change", callback);
+  // dispatch a click event to open the file dialog
+  inputElement.dispatchEvent(new MouseEvent("click"));
+}
+
 // TODO: handle json types seperately
-const PlaylistTable = ({ image, title, author, songs }) => {
+const PlaylistTable = ({ playlist, songs }) => {
+  const [editTextData, setEditTextData] = useState(false);
+
+  const [image, setImage] = useState(playlist.image);
+  const [title, setTitle] = useState(playlist.playlistTitle);
+  const [author, setAuthor] = useState(playlist.playlistAuthor);
+
   const [songsList, setSongsList] = useState(songs);
 
   const onDragEnd = ({ destination, source }) => {
@@ -175,12 +202,50 @@ const PlaylistTable = ({ image, title, author, songs }) => {
   return (
     <>
       <Pane display="flex" flexDirection="row" alignItems="center">
-        {image && <Avatar src={"data:image/png;" + image} size={50} />}
+        {image && (
+          <Avatar
+            src={"data:image/png;" + image}
+            size={50}
+            onClick={() => {
+              // get image upload and replace image in base64
+              openFileDialog((event) => {
+                let baseURL = "";
+                const reader = new FileReader();
+                const file = event.target.files[0];
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                  baseURL = reader.result;
+                  setImage(baseURL);
+                };
+              });
+            }}
+          />
+        )}
         <Heading margin={10}>
-          {title} - {author}
+          {editTextData ? (
+            <>
+              <TextInput
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />{" "}
+              -{" "}
+              <TextInput
+                value={author}
+                onChange={(e) => setAuthor(e.target.value)}
+              />
+            </>
+          ) : (
+            <>
+              {title} - {author}
+            </>
+          )}
         </Heading>
+        <Tooltip content="Edit Title & Author">
+          <EditIcon onClick={() => setEditTextData(!editTextData)} size={30} />
+        </Tooltip>
         <Tooltip content="Download">
           <FloppyDiskIcon
+            size={25}
             onClick={() => exportPlaylist(image, title, author, songsList)}
           />
         </Tooltip>
