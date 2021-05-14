@@ -90,8 +90,10 @@ class App extends React.Component {
         </Pane>
         {playlists.map((playlist, idx) => (
           <PlaylistTable
-            key={idx}
-            playlist={this.getConvertedPlaylist(playlist)}
+            key={playlist.data.playlistTitle + idx}
+            title={playlist.data.playlistTitle}
+            author={playlist.data.playlistAuthor}
+            songs={playlist.data.songs.map((song) => songCache[song.hash])}
           />
         ))}
       </Pane>
