@@ -2,7 +2,7 @@ import "./App.css";
 import React from "react";
 import store from "store";
 
-import { Pane, Heading } from "evergreen-ui";
+import { Pane, Heading, Checkbox } from "evergreen-ui";
 import PlaylistTable from "./components/PlaylistTable";
 import PlaylistImporter from "./components/PlaylistImporter";
 
@@ -10,9 +10,19 @@ const getMapByHash = async (hash) => {
   return (await fetch(`https://beatsaver.com/api/maps/by-hash/${hash}`)).json();
 };
 
+const bplistSongKeys = ["name", "description", "difficulties"];
+
+const initColumnsToShow = () => {
+  const output = {};
+  bplistSongKeys.forEach((key) => (output[key] = false));
+  return output;
+};
+
 class App extends React.Component {
   state = {
+    horizontalMode: false,
     playlists: [], // {playlistTitle, playlistAuthor, image, songs: [{hash}]}
+    columnsToShow: initColumnsToShow(),
   };
 
   componentDidMount() {
@@ -32,7 +42,15 @@ class App extends React.Component {
   };
 
   render() {
-    const { playlists, songCache } = this.state;
+    const { playlists, songCache, horizontalMode, columnsToShow } = this.state;
+
+    let filteredColumns = Object.entries(columnsToShow)
+      .filter(([_, value]) => value)
+      .map(([key, _]) => key);
+    if (filteredColumns.length === 0) {
+      filteredColumns = Object.keys(columnsToShow);
+    }
+
     return (
       <Pane
         width="100%"
@@ -88,13 +106,52 @@ class App extends React.Component {
             }}
           />
         </Pane>
-        {playlists.map((playlist, idx) => (
-          <PlaylistTable
-            key={playlist.data.playlistTitle + idx}
-            playlist={playlist.data}
-            songs={playlist.data.songs.map((song) => songCache[song.hash])}
-          />
-        ))}
+        <div
+          style={{
+            width: "100%",
+            flexDirection: "row",
+            display: "flex",
+          }}
+        >
+          <Pane minWidth="300px" padding={30}>
+            <Heading>Columns To Show</Heading>
+            {bplistSongKeys.map((key) => (
+              <Checkbox
+                key={key}
+                label={key}
+                checked={columnsToShow[key]}
+                onChange={(e) => {
+                  this.setState((prevState) => {
+                    const columnsToUpdate = prevState.columnsToShow;
+                    columnsToUpdate[key] = e.target.checked;
+                    return {
+                      columnsToShow: columnsToUpdate,
+                    };
+                  });
+                }}
+              />
+            ))}
+          </Pane>
+          <Pane
+            width="100%"
+            height="100vh"
+            display="flex"
+            flexDirection={horizontalMode ? "row" : "column"}
+            alignItems="center"
+            //justifyContent="center"
+            border="default"
+            overflowX="scroll"
+          >
+            {playlists.map((playlist, idx) => (
+              <PlaylistTable
+                columnsToShow={filteredColumns}
+                key={playlist.data.playlistTitle + idx}
+                playlist={playlist.data}
+                songs={playlist.data.songs.map((song) => songCache[song.hash])}
+              />
+            ))}
+          </Pane>
+        </div>
       </Pane>
     );
   }

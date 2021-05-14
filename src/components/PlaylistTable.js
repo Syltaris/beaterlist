@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   Avatar,
   Heading,
-  Pane,
   DragHandleHorizontalIcon,
   FloppyDiskIcon,
   EditIcon,
   Tooltip,
   TextInput,
+  Pane,
 } from "evergreen-ui";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 /*
@@ -85,7 +85,7 @@ const camelCaseToWords = (text) => {
   return finalResult;
 };
 
-const DraggableRow = ({ type, idx, song }) => {
+const DraggableRow = ({ columnsToShow, type, idx, song }) => {
   return (
     <Draggable key={song.hash} draggableId={song.hash} index={idx} type={type}>
       {(provided, snapshot) => (
@@ -103,7 +103,7 @@ const DraggableRow = ({ type, idx, song }) => {
           <Table.Cell flexBasis={60} flexGrow={0}>
             <Avatar src={`https://beatsaver.com${song.coverURL}`} size={40} />
           </Table.Cell>
-          {bplistSongKeys.map((key) => (
+          {columnsToShow.map((key) => (
             <Table.TextCell key={key}>{getColText(key, song)}</Table.TextCell>
           ))}
         </Table.Row>
@@ -169,7 +169,7 @@ function openFileDialog(callback) {
 }
 
 // TODO: handle json types seperately
-const PlaylistTable = ({ playlist, songs }) => {
+const PlaylistTable = ({ columnsToShow, playlist, songs }) => {
   const [editTextData, setEditTextData] = useState(false);
 
   const [image, setImage] = useState(playlist.image);
@@ -177,6 +177,11 @@ const PlaylistTable = ({ playlist, songs }) => {
   const [author, setAuthor] = useState(playlist.playlistAuthor);
 
   const [songsList, setSongsList] = useState(songs);
+  const [columns, setColumnsToShow] = useState(columnsToShow);
+
+  useEffect(() => {
+    setColumnsToShow(columnsToShow);
+  }, [columnsToShow]);
 
   const onDragEnd = ({ destination, source }) => {
     // the only one that is required
@@ -200,7 +205,17 @@ const PlaylistTable = ({ playlist, songs }) => {
   const TYPE = `${title}${author}`;
 
   return (
-    <>
+    <div
+      style={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        border: "default",
+        marginTop: 10,
+      }}
+    >
+      {" "}
       <Pane display="flex" flexDirection="row" alignItems="center">
         {image && (
           <Avatar
@@ -251,24 +266,29 @@ const PlaylistTable = ({ playlist, songs }) => {
         </Tooltip>
       </Pane>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Table width="80%">
+        <Table maxWidth="80%">
           <Table.Head height={42}>
             <Table.HeaderCell flexBasis={40} flexGrow={0} />
             <Table.HeaderCell flexBasis={60} flexGrow={0}>
               Cover
             </Table.HeaderCell>
-            {bplistSongKeys.map((key) => (
+            {columns.map((key) => (
               <Table.HeaderCell key={key}>
                 {camelCaseToWords(key)}
               </Table.HeaderCell>
             ))}
           </Table.Head>
-          <Table.Body minHeight={240}>
+          <Table.Body>
             <Droppable droppableId={title} type={TYPE}>
               {(provided, snapshot) => (
                 <div ref={provided.innerRef}>
                   {songsList.map((song, idx) => (
-                    <DraggableRow type={TYPE} idx={idx} song={song} />
+                    <DraggableRow
+                      columnsToShow={columns}
+                      type={TYPE}
+                      idx={idx}
+                      song={song}
+                    />
                   ))}
                   {provided.placeholder}
                 </div>
@@ -277,7 +297,7 @@ const PlaylistTable = ({ playlist, songs }) => {
           </Table.Body>
         </Table>
       </DragDropContext>
-    </>
+    </div>
   );
 };
 
