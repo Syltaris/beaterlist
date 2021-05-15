@@ -58,11 +58,12 @@ const App = () => {
       >
         <Heading color="white">BeaterList</Heading>
         <PlaylistImporter
-          onImportClick={(playlists) => {
-            for (const playlist of playlists) {
-              console.log("imp:", playlist);
-              playlistStore.addPlaylistFromBplistData(playlist.data); // can check type here
-            }
+          onImportClick={async (playlists) => {
+            const promises = playlists.map((playlist) =>
+              playlistStore.addPlaylistFromBplistData(playlist.data)
+            );
+            const out = await Promise.all(promises); // can check type here
+            console.log(playlists, "plist", out, promises);
           }}
         />
       </Pane>

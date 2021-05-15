@@ -59,10 +59,7 @@ const DraggableRow = ({ type, idx, song }) => {
             <DragHandleHorizontalIcon />
           </Table.Cell>
           <Table.Cell flexBasis={60} flexGrow={0}>
-            <Avatar
-              src={`https://beatsaver.com${song.beatSaverSongObject.coverURL}`}
-              size={40}
-            />
+            <Avatar src={song.coverURL} size={40} />
           </Table.Cell>
           {columnsToShow.map((key) => (
             <Table.TextCell key={key}>{getColText(key, song)}</Table.TextCell>

@@ -26,8 +26,10 @@ export class BeatSaverSongCache {
 
   // would love to use Promise.all if no rate limit :(
   async retrieveMultipleSongData(hashes, rateLimitDelay = 100) {
-    const missingHashes = hashes.filter((hash) => !hash in this.songCache);
+    const missingHashes = hashes.filter((hash) => !(hash in this.songCache));
+    console.log("getting hashes", missingHashes);
     for (const hash of missingHashes) {
+      console.log("getting from beat-saver server ", hash);
       const resp = await getMapByHash(hash);
       await new Promise((res) => setTimeout(res, rateLimitDelay)); // sleep
       this.songCache[hash] = resp;
@@ -73,7 +75,11 @@ export class PlaylistStore {
     store.set("playlists", playlistsJson);
   }
 
-  addPlaylistFromBplistData(data) {
+  addPlaylistFromBplistData = async (data) => {
+    // do preloading here for multiple songs
+    await beatSaverSongCache.retrieveMultipleSongData(
+      data.songs.map((song) => song.hash)
+    );
     const playlist = new Playlist(
       {
         image: data.image,
@@ -84,7 +90,9 @@ export class PlaylistStore {
       this
     );
     this.playlists.push(playlist);
-  }
+
+    this.saveAllPlaylists();
+  };
 }
 
 export const PlaylistStoreContext = createContext();
@@ -163,7 +171,7 @@ export class Playlist {
 
 export class Song {
   hash = null; // unique id
-  beatSaverSongObject = null; // data object retrieve from beat-saver server
+  beatSaverSongObject = undefined; // data object retrieve from beat-saver server
 
   constructor(savedSong) {
     this.hash = savedSong.hash;
@@ -171,19 +179,22 @@ export class Song {
   }
 
   get name() {
-    return this.beatSaverSongObject.metadata.songName;
+    return this.beatSaverSongObject?.metadata.songName;
   }
   get author() {
-    return this.beatSaverSongObject.metadata.songAuthorName;
+    return this.beatSaverSongObject?.metadata.songAuthorName;
   }
   get levelAuthor() {
-    return this.beatSaverSongObject.metadata.levelAuthorName;
+    return this.beatSaverSongObject?.metadata.levelAuthorName;
   }
   get difficulties() {
-    return this.beatSaverSongObject.metadata.difficulties;
+    return this.beatSaverSongObject?.metadata.difficulties;
   }
   get description() {
-    return this.beatSaverSongObject.description;
+    return this.beatSaverSongObject?.description;
+  }
+  get coverURL() {
+    return "https://beatsaver.com" + this.beatSaverSongObject?.coverURL;
   }
 
   asJson() {

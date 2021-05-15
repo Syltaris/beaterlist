@@ -4,6 +4,7 @@ import { FilePicker } from "evergreen-ui";
 const PlaylistImporter = ({ onImportClick }) => (
   <FilePicker
     multiple
+    accept=".bplist,.json"
     width={250}
     onChange={async (files) => {
       // assume bplist and json files can be parsed as json
