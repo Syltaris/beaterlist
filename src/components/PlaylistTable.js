@@ -44,7 +44,7 @@ const camelCaseToWords = (text) => {
   return finalResult;
 };
 
-const DraggableRow = ({ type, idx, song }) => {
+const DraggableRow = ({ type, idx, song, onRemoveSongClick }) => {
   const preferences = useContext(UserPreferencesContext);
   const columnsToShow = preferences.getPlaylistColumnNamesToShow();
   return (
@@ -67,6 +67,9 @@ const DraggableRow = ({ type, idx, song }) => {
           {columnsToShow.map((key) => (
             <Table.TextCell key={key}>{getColText(key, song)}</Table.TextCell>
           ))}
+          <Table.Cell flexBasis={35} flexGrow={0}>
+            <DeleteIcon onClick={() => onRemoveSongClick(song)} />
+          </Table.Cell>
         </Table.Row>
       )}
     </Draggable>
@@ -120,6 +123,7 @@ const PlaylistTable = ({ playlist }) => {
   const [showAddSongLoader, setShowAddSongLoader] = useState(false);
   const [addSongError, setAddSongError] = useState(false);
   const [songKeyInput, setSongKeyInput] = useState(undefined);
+  const [songToRemove, setSongToRemove] = useState(null);
 
   const [titleInput, setTitleInput] = useState(playlist.title);
   const [authorInput, setAuthorInput] = useState(playlist.author);
@@ -244,7 +248,24 @@ const PlaylistTable = ({ playlist }) => {
           isShown={showDeleteConfirmation}
           title={`Delete ${playlist.title}?`}
           onCloseComplete={() => setShowDeleteConfirmation(false)}
-          onConfirm={() => playlist.delete()}
+          onConfirm={() => {
+            playlist.delete();
+            setShowDeleteConfirmation(false);
+          }}
+          confirmLabel={"Confirm"}
+          intent="danger"
+        >
+          This action is irreverisble!
+        </Dialog>
+        <Dialog
+          /* this will vanish immediatetly on confirm, can consider moving out to global modals */
+          isShown={!!songToRemove}
+          title={`Delete ${songToRemove?.name} from ${playlist.title}?`}
+          onCloseComplete={() => setSongToRemove(null)}
+          onConfirm={() => {
+            playlist.removeSong(songToRemove);
+            setSongToRemove(null);
+          }}
           confirmLabel={"Confirm"}
           intent="danger"
         >
@@ -296,7 +317,12 @@ const PlaylistTable = ({ playlist }) => {
               {(provided, snapshot) => (
                 <div ref={provided.innerRef}>
                   {playlist.songs.map((song, idx) => (
-                    <DraggableRow type={TYPE} idx={idx} song={song} />
+                    <DraggableRow
+                      type={TYPE}
+                      idx={idx}
+                      song={song}
+                      onRemoveSongClick={(song) => setSongToRemove(song)}
+                    />
                   ))}
                   {provided.placeholder}
                 </div>

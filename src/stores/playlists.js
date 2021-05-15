@@ -173,6 +173,11 @@ export class Playlist {
     this.store.deletePlaylist(this);
   }
 
+  removeSong(song) {
+    const idx = this.songs.indexOf(song);
+    this.songs.splice(idx, 1);
+  }
+
   async addSongByKey(songKey) {
     // try to find song in beat-saver
     // if have, save the data, and the song, save the playlist after
@@ -181,6 +186,12 @@ export class Playlist {
       const resp = await getMapByKey(songKey);
       const songData = await resp.json();
       console.log(songData);
+      const duplicateSong = this.songs.find(
+        (song) => song.hash === songData.hash
+      );
+      if (duplicateSong) {
+        return; // should show some error here tho
+      }
       beatSaverSongCache.manualAddSongData(songData);
       this._songs.push(new Song({ hash: songData.hash }));
       this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
