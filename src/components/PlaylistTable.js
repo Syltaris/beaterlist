@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { observer } from "mobx-react-lite";
 import {
   Table,
   Avatar,
@@ -11,59 +12,12 @@ import {
   Pane,
 } from "evergreen-ui";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-/*
-{
-    "metadata":{
-        "difficulties":{"easy":false,"normal":true,"hard":true,"expert":true,"expertPlus":false},
-        "duration":0,
-        "automapper":null,
-        "characteristics":[
-            {
-                "name":"Standard",
-                "difficulties": {
-                    "easy":null,
-                    "normal":{"duration":355.7663269042969,"length":167,"bombs":334,"notes":375,"obstacles":9,"njs":10,"njsOffset":0},
-                    "hard":{"duration":355.7450866699219,"length":167,"bombs":306,"notes":480,"obstacles":3,"njs":10,"njsOffset":0},
-                    "expert":{"duration":355.7450866699219,"length":167,"bombs":138,"notes":662,"obstacles":3,"njs":10,"njsOffset":0},
-                    "expertPlus":null
-                }
-            }
-        ],
-        "songName":"Technologic",
-        "songSubName":"Daft Punk",
-        "songAuthorName":"Awfulnaut",
-        "levelAuthorName":"awfulnaut",
-        "bpm":127
-    },
-    "stats":{
-        "downloads":428745,
-        "plays":6632,
-        "downVotes":186,
-        "upVotes":9789,
-        "heat":120.6632514,
-        "rating":0.9512470277249632
-    },
-    "description":"Expert / Hard / Normal",
-    "deletedAt":null,
-    "_id":"5cff620e48229f7d88fc67a8",
-    "key":"747",
-    "name":"Technologic - Daft Punk (Update)",
-    "uploader":{"_id":"5cff0b7398cc5a672c84edac","username":"awfulnaut"},
-    "uploaded":"2018-06-30T18:30:38.000Z",
-    "hash":"831247d7d02e948e5d03622748bb130b5057023d",
-    "directDownload":"/cdn/747/831247d7d02e948e5d03622748bb130b5057023d.zip",
-    "downloadURL":"/api/download/key/747",
-    "coverURL":"/cdn/747/831247d7d02e948e5d03622748bb130b5057023d.jpg"
-}
-*/
-
-const bplistSongKeys = ["name", "description", "difficulties"];
 
 const getColText = (key, song) => {
   // special cases
   switch (key) {
     case "difficulties":
-      return Object.entries(song.metadata.difficulties)
+      return Object.entries(song.difficulties)
         .filter(([key, value]) => value)
         .map(([key, _]) => key)
         .join(",");
@@ -74,8 +28,6 @@ const getColText = (key, song) => {
   // very dirty way to parse out the relevant col data
   if (key in song) {
     return song[key];
-  } else if (key in song.metadata) {
-    return song.metadata[key];
   }
 };
 
@@ -101,7 +53,10 @@ const DraggableRow = ({ columnsToShow, type, idx, song }) => {
             <DragHandleHorizontalIcon />
           </Table.Cell>
           <Table.Cell flexBasis={60} flexGrow={0}>
-            <Avatar src={`https://beatsaver.com${song.coverURL}`} size={40} />
+            <Avatar
+              src={`https://beatsaver.com${song.beatSaverSongObject.coverURL}`}
+              size={40}
+            />
           </Table.Cell>
           {columnsToShow.map((key) => (
             <Table.TextCell key={key}>{getColText(key, song)}</Table.TextCell>
@@ -112,34 +67,15 @@ const DraggableRow = ({ columnsToShow, type, idx, song }) => {
   );
 };
 
-const exportPlaylist = (image, title, author, songsList) => {
-  const bplistJson = {
-    image,
-    playlistTitle: title,
-    playlistAuthor: author,
-    songs: songsList.map((song) => ({
-      songName: song.metadata.name,
-      levelAuthorName: song.metadata.levelAuthorName,
-      hash: song.hash,
-      levelid: `custom_level_${song.hash}`,
-      difficulties: song.metadata.characteristics.flatMap((characteristic) =>
-        Object.entries(characteristic.difficulties)
-          .filter(([key, value]) => value !== null)
-          .map(([key, value]) => ({
-            characteristic: characteristic.name,
-            name: key,
-          }))
-      ),
-    })),
-  };
-
+const exportPlaylist = (playlist) => {
+  const bplistJson = playlist.asBplistJson();
   var element = document.createElement("a");
   element.setAttribute(
     "href",
     "data:text/plain;charset=utf-8," +
       encodeURIComponent(JSON.stringify(bplistJson))
   );
-  element.setAttribute("download", `${title}.bplist`);
+  element.setAttribute("download", `${playlist.title}.bplist`);
 
   element.style.display = "none";
   document.body.appendChild(element);
@@ -169,19 +105,10 @@ function openFileDialog(callback) {
 }
 
 // TODO: handle json types seperately
-const PlaylistTable = ({ columnsToShow, playlist, songs }) => {
+const PlaylistTable = ({ columnsToShow, playlist }) => {
+  console.log(playlist, "rerends.");
   const [editTextData, setEditTextData] = useState(false);
-
-  const [image, setImage] = useState(playlist.image);
-  const [title, setTitle] = useState(playlist.playlistTitle);
-  const [author, setAuthor] = useState(playlist.playlistAuthor);
-
-  const [songsList, setSongsList] = useState(songs);
   const [columns, setColumnsToShow] = useState(columnsToShow);
-
-  useEffect(() => {
-    setColumnsToShow(columnsToShow);
-  }, [columnsToShow]);
 
   const onDragEnd = ({ destination, source }) => {
     // the only one that is required
@@ -192,17 +119,14 @@ const PlaylistTable = ({ columnsToShow, playlist, songs }) => {
     const destIdx = destination.index;
     const sourceIdx = source.index;
 
-    // insert dragIdx item to hoverIdx position
-    setSongsList((list) => {
-      const listToUpdate = [...list];
-      const itemToInsert = listToUpdate[sourceIdx];
-      listToUpdate.splice(sourceIdx, 1);
-      listToUpdate.splice(destIdx, 0, itemToInsert);
-      return listToUpdate;
-    });
+    const listToUpdate = [...playlist.songs];
+    const itemToInsert = listToUpdate[sourceIdx];
+    listToUpdate.splice(sourceIdx, 1);
+    listToUpdate.splice(destIdx, 0, itemToInsert);
+    playlist.songs = listToUpdate;
   };
 
-  const TYPE = `${title}${author}`;
+  const TYPE = `${playlist.title}${playlist.author}`;
 
   return (
     <div
@@ -217,9 +141,9 @@ const PlaylistTable = ({ columnsToShow, playlist, songs }) => {
     >
       {" "}
       <Pane display="flex" flexDirection="row" alignItems="center">
-        {image && (
+        {playlist.image && (
           <Avatar
-            src={"data:image/png;" + image}
+            src={"data:image/png;" + playlist.image}
             size={50}
             onClick={() => {
               // get image upload and replace image in base64
@@ -230,7 +154,7 @@ const PlaylistTable = ({ columnsToShow, playlist, songs }) => {
                 reader.readAsDataURL(file);
                 reader.onload = () => {
                   baseURL = reader.result;
-                  setImage(baseURL);
+                  playlist.image = baseURL;
                 };
               });
             }}
@@ -240,18 +164,18 @@ const PlaylistTable = ({ columnsToShow, playlist, songs }) => {
           {editTextData ? (
             <>
               <TextInput
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                value={playlist.title}
+                onChange={(e) => (playlist.title = e.target.value)}
               />{" "}
               -{" "}
               <TextInput
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
+                value={playlist.author}
+                onChange={(e) => (playlist.author = e.target.value)}
               />
             </>
           ) : (
             <>
-              {title} - {author}
+              {playlist.title} - {playlist.author}
             </>
           )}
         </Heading>
@@ -259,10 +183,7 @@ const PlaylistTable = ({ columnsToShow, playlist, songs }) => {
           <EditIcon onClick={() => setEditTextData(!editTextData)} size={30} />
         </Tooltip>
         <Tooltip content="Download">
-          <FloppyDiskIcon
-            size={25}
-            onClick={() => exportPlaylist(image, title, author, songsList)}
-          />
+          <FloppyDiskIcon size={25} onClick={() => exportPlaylist(playlist)} />
         </Tooltip>
       </Pane>
       <DragDropContext onDragEnd={onDragEnd}>
@@ -279,10 +200,10 @@ const PlaylistTable = ({ columnsToShow, playlist, songs }) => {
             ))}
           </Table.Head>
           <Table.Body>
-            <Droppable droppableId={title} type={TYPE}>
+            <Droppable droppableId={playlist.title} type={TYPE}>
               {(provided, snapshot) => (
                 <div ref={provided.innerRef}>
-                  {songsList.map((song, idx) => (
+                  {playlist.songs.map((song, idx) => (
                     <DraggableRow
                       columnsToShow={columns}
                       type={TYPE}
@@ -301,4 +222,4 @@ const PlaylistTable = ({ columnsToShow, playlist, songs }) => {
   );
 };
 
-export default PlaylistTable;
+export default observer(PlaylistTable);
