@@ -12,10 +12,14 @@ const initColumnsToShow = () => {
 
 export class UserPreferencesStore {
   _playlistsHorizontalMode = false;
-  _playlistColumnsToShow = initColumnsToShow();
+  _playlistColumnsToShow = undefined;
 
   constructor() {
     makeAutoObservable(this);
+    this._playlistsHorizontalMode =
+      store.get("playlistHorizontalMode") || false;
+    this._playlistColumnsToShow =
+      store.get("playlistColumnsToShow") || initColumnsToShow();
   }
 
   get playlistHorizontalMode() {
@@ -23,6 +27,7 @@ export class UserPreferencesStore {
   }
   set playlistHorizontalMode(flag) {
     this._playlistsHorizontalMode = flag;
+    store.set("playlistHorizontalMode", flag);
   }
 
   get playlistColumnsToShow() {
@@ -30,10 +35,12 @@ export class UserPreferencesStore {
   }
   set playlistColumnsToShow(columns) {
     this._playlistColumnsToShow = columns;
+    store.set("playlistColumnsToShow", this._playlistColumnsToShow);
   }
 
   setPlaylistColumnToShow(key, flag) {
     this._playlistColumnsToShow[key] = flag;
+    store.set("playlistColumnsToShow", this._playlistColumnsToShow);
   }
   getPlaylistColumnNamesToShow() {
     const columns = Object.entries(this._playlistColumnsToShow)
