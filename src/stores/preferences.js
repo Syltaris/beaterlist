@@ -35,7 +35,7 @@ export class UserPreferencesStore {
   }
   set playlistColumnsToShow(columns) {
     this._playlistColumnsToShow = columns;
-    store.set("playlistColumnsToShow", this._playlistColumnsToShow);
+    store.set("playlistColumnsToShow", this._playlistColumnsToShow); // probably can autorun the save function
   }
 
   setPlaylistColumnToShow(key, flag) {

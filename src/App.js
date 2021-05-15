@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { observer } from "mobx-react-lite";
 
 import { Pane, Heading, Checkbox } from "evergreen-ui";
@@ -102,7 +102,7 @@ const App = () => {
           flexDirection={horizontalMode ? "row" : "column"}
           //justifyContent="center"
           border="default"
-          overflowX="scroll"
+          //overflowX="scroll"
         >
           {playlists.map((playlist, idx) => (
             <PlaylistTable key={playlist.title + idx} playlist={playlist} />

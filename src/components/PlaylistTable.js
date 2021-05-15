@@ -11,6 +11,7 @@ import {
   TextInput,
   Pane,
   Button,
+  DeleteIcon,
 } from "evergreen-ui";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
@@ -121,6 +122,7 @@ const PlaylistTable = ({ playlist }) => {
 
   const onDragEnd = ({ destination, source }) => {
     // the only one that is required
+    console.log(destination, source);
     if (!destination || !source) {
       return;
     }
@@ -135,7 +137,7 @@ const PlaylistTable = ({ playlist }) => {
     playlist.songs = listToUpdate;
   };
 
-  const TYPE = `${playlist.title}${playlist.author}`;
+  const TYPE = "playlistSong"; //`${playlist.title}${playlist.author}`;
 
   return (
     <div
@@ -220,6 +222,9 @@ const PlaylistTable = ({ playlist }) => {
         </Tooltip>
         <Tooltip content="Download">
           <FloppyDiskIcon size={25} onClick={() => exportPlaylist(playlist)} />
+        </Tooltip>
+        <Tooltip content="Delete">
+          <DeleteIcon size={25} onClick={() => playlist.delete()} />
         </Tooltip>
       </Pane>
       <DragDropContext onDragEnd={onDragEnd}>

@@ -55,20 +55,34 @@ export class PlaylistStore {
     const savedPlaylists = store.get("playlists");
     if (savedPlaylists) {
       const playlists = [];
-      for (const playlist in savedPlaylists) {
-        playlists.push(new Playlist(playlist)); // converts json to Playlist objects
+      for (const playlist of savedPlaylists) {
+        playlists.push(new Playlist(playlist, this)); // converts json to Playlist objects
       }
       this.playlists = playlists;
     }
   }
 
+  deletePlaylist(playlist) {
+    const idx = this.playlists.indexOf(playlist);
+    this.playlists.splice(idx, 1);
+    this.saveAllPlaylists();
+  }
+
+  saveAllPlaylists() {
+    const playlistsJson = this.playlists.map((playlist) => playlist.asJson());
+    store.set("playlists", playlistsJson);
+  }
+
   addPlaylistFromBplistData(data) {
-    const playlist = new Playlist({
-      image: data.image,
-      title: data.playlistTitle,
-      author: data.playlistAuthor,
-      songs: data.songs,
-    });
+    const playlist = new Playlist(
+      {
+        image: data.image,
+        title: data.playlistTitle,
+        author: data.playlistAuthor,
+        songs: data.songs,
+      },
+      this
+    );
     this.playlists.push(playlist);
   }
 }
@@ -81,12 +95,15 @@ export class Playlist {
   _author = "";
   _songs = []; // array of Songs
 
-  constructor(savedPlaylist) {
+  store = undefined;
+
+  constructor(savedPlaylist, store) {
     makeAutoObservable(this);
-    this.image = savedPlaylist.image;
-    this.title = savedPlaylist.title;
-    this.author = savedPlaylist.author;
-    this.songs = savedPlaylist.songs.map((song) => new Song(song));
+    this._image = savedPlaylist.image;
+    this._title = savedPlaylist.title;
+    this._author = savedPlaylist.author;
+    this._songs = savedPlaylist.songs.map((song) => new Song(song));
+    this.store = store;
   }
 
   get image() {
@@ -94,6 +111,7 @@ export class Playlist {
   }
   set image(image) {
     this._image = image;
+    this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
   }
 
   get title() {
@@ -101,6 +119,7 @@ export class Playlist {
   }
   set title(title) {
     this._title = title;
+    this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
   }
 
   get author() {
@@ -108,6 +127,7 @@ export class Playlist {
   }
   set author(author) {
     this._author = author;
+    this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
   }
 
   get songs() {
@@ -115,6 +135,20 @@ export class Playlist {
   }
   set songs(songs) {
     this._songs = songs;
+    this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
+  }
+
+  delete() {
+    this.store.deletePlaylist(this);
+  }
+
+  asJson() {
+    return {
+      image: this.image,
+      title: this.title,
+      author: this.author,
+      songs: this.songs.map((song) => song.asJson()),
+    };
   }
 
   asBplistJson() {
@@ -122,7 +156,7 @@ export class Playlist {
       image: this.image,
       playlistTitle: this.title,
       playlistAuthor: this.author,
-      songs: this.songs.map((song) => song.asJson()),
+      songs: this.songs.map((song) => song.asBplistJson()),
     };
   }
 }
@@ -153,6 +187,13 @@ export class Song {
   }
 
   asJson() {
+    // only need hash, as the rest of the data can be retrieved from cache
+    return {
+      hash: this.hash,
+    };
+  }
+
+  asBplistJson() {
     return {
       hash: this.hash,
       levelid: `custom_level_${this.hash}`,
