@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { observer } from "mobx-react-lite";
 
-import { Pane, Heading, Checkbox } from "evergreen-ui";
+import { Pane, Heading, Checkbox, Button } from "evergreen-ui";
 import PlaylistTable from "./components/PlaylistTable";
 import PlaylistImporter from "./components/PlaylistImporter";
 
@@ -9,14 +9,16 @@ import { PlaylistStoreContext } from "./stores/playlists";
 import { UserPreferencesContext } from "./stores/preferences";
 
 // TodO:
-// create playlists
-// list to list exchanges
+// persist config
 // delete playlist?
-// playlist import to persist playlist (import will need to do replacement checks)
+// create playlists
+
 // add songs by hash?
+// list to list exchanges
+// playlist import to persist playlist (import will need to do replacement checks)
+// playlist title edit collision check
 // load in playlist browser (beat saver), to drag playlists in
 // more columns, beautified difficulties
-// persist config
 
 const App = () => {
   const preferences = useContext(UserPreferencesContext);
@@ -57,15 +59,6 @@ const App = () => {
         backgroundColor="#012548"
       >
         <Heading color="white">BeaterList</Heading>
-        <PlaylistImporter
-          onImportClick={async (playlists) => {
-            const promises = playlists.map((playlist) =>
-              playlistStore.addPlaylistFromBplistData(playlist.data)
-            );
-            const out = await Promise.all(promises); // can check type here
-            console.log(playlists, "plist", out, promises);
-          }}
-        />
       </Pane>
       <div
         style={{
@@ -95,6 +88,19 @@ const App = () => {
               }
             />
           ))}
+
+          <PlaylistImporter
+            onImportClick={async (playlists) => {
+              const promises = playlists.map((playlist) =>
+                playlistStore.addPlaylistFromBplistData(playlist.data)
+              );
+              const out = await Promise.all(promises); // can check type here
+              console.log(playlists, "plist", out, promises);
+            }}
+          />
+          <Button onClick={() => playlistStore.createNewPlaylist()}>
+            Add new playlist
+          </Button>
         </Pane>
         <Pane
           width="100%"

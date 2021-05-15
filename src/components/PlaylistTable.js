@@ -12,6 +12,9 @@ import {
   Pane,
   Button,
   DeleteIcon,
+  Dialog,
+  AddIcon,
+  Spinner,
 } from "evergreen-ui";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
@@ -111,6 +114,13 @@ function openFileDialog(callback) {
 const PlaylistTable = ({ playlist }) => {
   console.log(playlist, "rerends.");
   const [editTextData, setEditTextData] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showAddSongLoader, setShowAddSongLoader] = useState(false);
+  const [addSongError, setAddSongError] = useState(false);
+  const [songKeyInput, setSongKeyInput] = useState(undefined);
+
   const [titleInput, setTitleInput] = useState(playlist.title);
   const [authorInput, setAuthorInput] = useState(playlist.author);
 
@@ -221,8 +231,52 @@ const PlaylistTable = ({ playlist }) => {
           <FloppyDiskIcon size={25} onClick={() => exportPlaylist(playlist)} />
         </Tooltip>
         <Tooltip content="Delete">
-          <DeleteIcon size={25} onClick={() => playlist.delete()} />
+          <DeleteIcon
+            size={25}
+            onClick={() => setShowDeleteConfirmation(true)}
+          />
         </Tooltip>
+        <Tooltip content="Add new song">
+          <AddIcon size={25} onClick={() => setShowAddDialog(true)} />
+        </Tooltip>
+        <Dialog
+          /* this will vanish immediatetly on confirm, can consider moving out to global modals */
+          isShown={showDeleteConfirmation}
+          title={`Delete ${playlist.title}?`}
+          onCloseComplete={() => setShowDeleteConfirmation(false)}
+          onConfirm={() => playlist.delete()}
+          confirmLabel={"Confirm"}
+          intent="danger"
+        >
+          This action is irreverisble!
+        </Dialog>
+        <Dialog
+          shouldCloseOnOverlayClick={false}
+          isShown={showAddDialog}
+          title={`Add new song to ${playlist.title}`}
+          onCloseComplete={() => setShowAddDialog(false)}
+          onConfirm={async () => {
+            try {
+              setAddSongError(false);
+              setShowAddSongLoader(true);
+              await playlist.addSongByKey(songKeyInput);
+            } catch (err) {
+              setAddSongError(true);
+              console.log(err);
+            } finally {
+              setShowAddSongLoader(false);
+            }
+          }}
+          confirmLabel={"Add"}
+        >
+          {showAddSongLoader && <Spinner />}
+          Add the song key you want to add here:
+          <TextInput
+            isInvalid={addSongError}
+            value={songKeyInput}
+            onChange={(e) => setSongKeyInput(e.target.value)}
+          ></TextInput>
+        </Dialog>
       </Pane>
       <DragDropContext onDragEnd={onDragEnd}>
         <Table maxWidth="80%">

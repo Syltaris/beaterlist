@@ -7,12 +7,21 @@ const getMapByHash = async (hash) => {
   return (await fetch(`https://beatsaver.com/api/maps/by-hash/${hash}`)).json();
 };
 
+const getMapByKey = async (songKey) => {
+  return await fetch(`https://beatsaver.com/api/maps/detail/${songKey}`);
+};
+
 // stores a cache of beat-saver song data
 export class BeatSaverSongCache {
   songCache = null;
 
   constructor() {
     this.songCache = store.get("songCache") ?? {}; // hash: data
+  }
+
+  manualAddSongData(data) {
+    this.songCache[data.hash] = data;
+    store.set("songCache", this.songCache);
   }
 
   async retrieveSongData(hash) {
@@ -62,6 +71,20 @@ export class PlaylistStore {
       }
       this.playlists = playlists;
     }
+  }
+
+  createNewPlaylist() {
+    const playlist = new Playlist(
+      {
+        image: "",
+        title: "New Playlist",
+        author: "Beaterlist",
+        songs: [],
+      },
+      this
+    );
+    this.playlists.push(playlist);
+    this.saveAllPlaylists();
   }
 
   deletePlaylist(playlist) {
@@ -148,6 +171,22 @@ export class Playlist {
 
   delete() {
     this.store.deletePlaylist(this);
+  }
+
+  async addSongByKey(songKey) {
+    // try to find song in beat-saver
+    // if have, save the data, and the song, save the playlist after
+    // if not, do nothing
+    try {
+      const resp = await getMapByKey(songKey);
+      const songData = await resp.json();
+      console.log(songData);
+      beatSaverSongCache.manualAddSongData(songData);
+      this._songs.push(new Song({ hash: songData.hash }));
+      this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
+    } catch (err) {
+      throw err;
+    }
   }
 
   asJson() {
