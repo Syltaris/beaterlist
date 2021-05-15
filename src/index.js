@@ -5,11 +5,17 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
 import { PlaylistStoreContext, PlaylistStore } from "./stores/playlists";
+import {
+  UserPreferencesContext,
+  UserPreferencesStore,
+} from "./stores/preferences";
 
 ReactDOM.render(
   <React.StrictMode>
     <PlaylistStoreContext.Provider value={new PlaylistStore()}>
-      <App />
+      <UserPreferencesContext.Provider value={new UserPreferencesStore()}>
+        <App />
+      </UserPreferencesContext.Provider>
     </PlaylistStoreContext.Provider>
   </React.StrictMode>,
   document.getElementById("root")

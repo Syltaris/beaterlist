@@ -6,14 +6,7 @@ import PlaylistTable from "./components/PlaylistTable";
 import PlaylistImporter from "./components/PlaylistImporter";
 
 import { PlaylistStoreContext } from "./stores/playlists";
-
-const bplistSongKeys = ["name", "description", "difficulties"];
-
-const initColumnsToShow = () => {
-  const output = {};
-  bplistSongKeys.forEach((key) => (output[key] = false));
-  return output;
-};
+import { UserPreferencesContext } from "./stores/preferences";
 
 // TodO:
 // create playlists
@@ -26,8 +19,9 @@ const initColumnsToShow = () => {
 // persist config
 
 const App = () => {
-  const [horizontalMode, setHorizontalMode] = useState(false);
-  const [columnsToShow, setColumnsToShow] = useState(initColumnsToShow());
+  const preferences = useContext(UserPreferencesContext);
+  const horizontalMode = preferences.playlistHorizontalMode;
+  const columnsToShow = preferences.playlistColumnsToShow;
 
   const playlistStore = useContext(PlaylistStoreContext);
   const playlists = playlistStore.playlists;
@@ -85,25 +79,19 @@ const App = () => {
             label="Horizontal Mode"
             checked={horizontalMode}
             onChange={(e) => {
-              this.setState({ horizontalMode: e.target.checked });
+              preferences.playlistHorizontalMode = e.target.checked;
             }}
           />
 
           <Heading>Columns To Show</Heading>
-          {bplistSongKeys.map((key) => (
+          {Object.keys(preferences.playlistColumnsToShow).map((key) => (
             <Checkbox
               key={key}
               label={key}
               checked={columnsToShow[key]}
-              onChange={(e) => {
-                this.setState((prevState) => {
-                  const columnsToUpdate = prevState.columnsToShow;
-                  columnsToUpdate[key] = e.target.checked;
-                  return {
-                    columnsToShow: columnsToUpdate,
-                  };
-                });
-              }}
+              onChange={(e) =>
+                preferences.setPlaylistColumnToShow(key, e.target.checked)
+              }
             />
           ))}
         </Pane>
@@ -117,11 +105,7 @@ const App = () => {
           overflowX="scroll"
         >
           {playlists.map((playlist, idx) => (
-            <PlaylistTable
-              columnsToShow={filteredColumns}
-              key={playlist.title + idx}
-              playlist={playlist}
-            />
+            <PlaylistTable key={playlist.title + idx} playlist={playlist} />
           ))}
         </Pane>
       </div>

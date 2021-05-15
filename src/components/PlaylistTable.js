@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { observer } from "mobx-react-lite";
 import {
   Table,
@@ -10,8 +10,11 @@ import {
   Tooltip,
   TextInput,
   Pane,
+  Button,
 } from "evergreen-ui";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+
+import { UserPreferencesContext } from "../stores/preferences";
 
 const getColText = (key, song) => {
   // special cases
@@ -37,7 +40,9 @@ const camelCaseToWords = (text) => {
   return finalResult;
 };
 
-const DraggableRow = ({ columnsToShow, type, idx, song }) => {
+const DraggableRow = ({ type, idx, song }) => {
+  const preferences = useContext(UserPreferencesContext);
+  const columnsToShow = preferences.getPlaylistColumnNamesToShow();
   return (
     <Draggable key={song.hash} draggableId={song.hash} index={idx} type={type}>
       {(provided, snapshot) => (
@@ -105,10 +110,14 @@ function openFileDialog(callback) {
 }
 
 // TODO: handle json types seperately
-const PlaylistTable = ({ columnsToShow, playlist }) => {
+const PlaylistTable = ({ playlist }) => {
   console.log(playlist, "rerends.");
   const [editTextData, setEditTextData] = useState(false);
-  const [columns, setColumnsToShow] = useState(columnsToShow);
+  const [titleInput, setTitleInput] = useState(playlist.title);
+  const [authorInput, setAuthorInput] = useState(playlist.author);
+
+  const preferences = useContext(UserPreferencesContext);
+  const columnsToShow = preferences.getPlaylistColumnNamesToShow();
 
   const onDragEnd = ({ destination, source }) => {
     // the only one that is required
@@ -164,13 +173,15 @@ const PlaylistTable = ({ columnsToShow, playlist }) => {
           {editTextData ? (
             <>
               <TextInput
-                value={playlist.title}
-                onChange={(e) => (playlist.title = e.target.value)}
+                value={titleInput}
+                width="150px"
+                onChange={(e) => setTitleInput(e.target.value)}
               />{" "}
               -{" "}
               <TextInput
-                value={playlist.author}
-                onChange={(e) => (playlist.author = e.target.value)}
+                value={authorInput}
+                width="150px"
+                onChange={(e) => setAuthorInput(e.target.value)}
               />
             </>
           ) : (
@@ -180,7 +191,32 @@ const PlaylistTable = ({ columnsToShow, playlist }) => {
           )}
         </Heading>
         <Tooltip content="Edit Title & Author">
-          <EditIcon onClick={() => setEditTextData(!editTextData)} size={30} />
+          {editTextData ? (
+            <>
+              <Button
+                intent="success"
+                onClick={() => {
+                  playlist.title = titleInput;
+                  playlist.author = authorInput;
+                  setEditTextData(false);
+                }}
+              >
+                Save
+              </Button>
+              <Button
+                intent="danger"
+                onClick={() => {
+                  setTitleInput(playlist.title);
+                  setAuthorInput(playlist.author);
+                  setEditTextData(false);
+                }}
+              >
+                Discard
+              </Button>
+            </>
+          ) : (
+            <EditIcon onClick={() => setEditTextData(true)} size={30} />
+          )}
         </Tooltip>
         <Tooltip content="Download">
           <FloppyDiskIcon size={25} onClick={() => exportPlaylist(playlist)} />
@@ -193,7 +229,7 @@ const PlaylistTable = ({ columnsToShow, playlist }) => {
             <Table.HeaderCell flexBasis={60} flexGrow={0}>
               Cover
             </Table.HeaderCell>
-            {columns.map((key) => (
+            {columnsToShow.map((key) => (
               <Table.HeaderCell key={key}>
                 {camelCaseToWords(key)}
               </Table.HeaderCell>
@@ -204,12 +240,7 @@ const PlaylistTable = ({ columnsToShow, playlist }) => {
               {(provided, snapshot) => (
                 <div ref={provided.innerRef}>
                   {playlist.songs.map((song, idx) => (
-                    <DraggableRow
-                      columnsToShow={columns}
-                      type={TYPE}
-                      idx={idx}
-                      song={song}
-                    />
+                    <DraggableRow type={TYPE} idx={idx} song={song} />
                   ))}
                   {provided.placeholder}
                 </div>
