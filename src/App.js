@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { observer } from "mobx-react-lite";
-import { DragDropContext } from "react-beautiful-dnd";
+import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 import { Pane, Heading, Checkbox, Button } from "evergreen-ui";
 import PlaylistTable from "./components/PlaylistTable";
@@ -66,6 +66,16 @@ const App = () => {
       return;
     }
 
+    // playlists reordering logic
+    if (
+      source.droppableId === "playlists" &&
+      destination.droppableId === "playlists"
+    ) {
+      const playlistToMove = playlistStore.playlists[source.index];
+      playlistStore.movePlaylist(playlistToMove, destination.index);
+      return;
+    }
+
     if (
       destination.droppableId === source.droppableId &&
       destIdx === sourceIdx
@@ -90,8 +100,8 @@ const App = () => {
         (p) => p.id === destination.droppableId
       );
       const songToMove = sourcePlaylist.songs[sourceIdx];
-      destinationPlaylist.insertSongAtIdx(songToMove, destIdx);
       sourcePlaylist.removeSong(songToMove);
+      destinationPlaylist.insertSongAtIdx(songToMove, destIdx);
     }
     playlistStore.saveAllPlaylists();
   };
@@ -169,23 +179,44 @@ const App = () => {
             <BeatSaverBrowser />
           </Pane>
 
-          <Pane
-            width="100%"
-            height="80vh"
-            display="flex"
-            flexDirection={horizontalMode ? "row" : "column"}
-            //justifyContent="center"
-            border="default"
-            //overflowX="scroll"
-          >
-            {playlists.map((playlist, idx) => (
-              <PlaylistTable
-                key={`${playlist.title}|${idx}`}
-                playlistKey={`${playlist.title}|${idx}`}
-                playlist={playlist}
-              />
-            ))}
-          </Pane>
+          <Droppable type="playlists" droppableId="playlists">
+            {(provider) => (
+              <>
+                <Pane
+                  ref={provider.innerRef}
+                  width="100%"
+                  height="80vh"
+                  display="flex"
+                  flexDirection={horizontalMode ? "row" : "column"}
+                  //justifyContent="center"
+                  border="default"
+                  //overflowX="scroll"
+                >
+                  {playlists.map((playlist, idx) => (
+                    <Draggable
+                      draggableId={`playlist-${playlist.id}`}
+                      index={idx}
+                    >
+                      {(provided) => (
+                        <Pane
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                        >
+                          <PlaylistTable
+                            key={`${playlist.title}|${idx}`}
+                            playlistKey={`${playlist.title}|${idx}`}
+                            playlist={playlist}
+                          />
+                        </Pane>
+                      )}
+                    </Draggable>
+                  ))}
+                </Pane>
+                {provider.placeholder}
+              </>
+            )}
+          </Droppable>
         </DragDropContext>
       </div>
     </Pane>

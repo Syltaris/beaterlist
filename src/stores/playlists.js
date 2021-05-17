@@ -135,6 +135,12 @@ export class PlaylistStore {
     this.saveAllPlaylists();
   }
 
+  movePlaylist(playlist, idx) {
+    this.playlists.splice(this.playlists.indexOf(playlist), 1);
+    this.playlists.splice(idx, 0, playlist);
+    this.saveAllPlaylists();
+  }
+
   saveAllPlaylists() {
     const playlistsJson = this.playlists.map((playlist) => playlist.asJson());
     store.set("playlists", playlistsJson);
