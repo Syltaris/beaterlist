@@ -56,9 +56,10 @@ const App = () => {
       return;
     }
 
+    // droppableId are playlist unique ids
     // very kludgey, should use some id?
     const sourcePlaylist = playlistStore.playlists.find(
-      (p) => p.title === source.droppableId
+      (p) => p.id === source.droppableId
     );
     // move within list
     if (destination.droppableId === source.droppableId) {
@@ -68,7 +69,7 @@ const App = () => {
     } else {
       // move across list
       const destinationPlaylist = playlistStore.playlists.find(
-        (p) => p.title === destination.droppableId
+        (p) => p.id === destination.droppableId
       );
       const songToMove = sourcePlaylist.songs[sourceIdx];
       destinationPlaylist.insertSongAtIdx(songToMove, destIdx);
@@ -154,7 +155,11 @@ const App = () => {
             //overflowX="scroll"
           >
             {playlists.map((playlist, idx) => (
-              <PlaylistTable key={playlist.title + idx} playlist={playlist} />
+              <PlaylistTable
+                key={`${playlist.title}|${idx}`}
+                playlistKey={`${playlist.title}|${idx}`}
+                playlist={playlist}
+              />
             ))}
           </Pane>
         </DragDropContext>

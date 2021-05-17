@@ -294,7 +294,7 @@ const PlaylistTable = ({ playlist }) => {
           ))}
         </Table.Head>
         <Table.Body display="flex">
-          <Droppable droppableId={playlist.title} type={TYPE}>
+          <Droppable droppableId={playlist.id} type={TYPE}>
             {(provided, snapshot) => (
               <div
                 ref={provided.innerRef}

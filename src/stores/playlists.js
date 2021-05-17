@@ -1,6 +1,7 @@
 import { createContext } from "react";
 import store from "store";
 import { makeAutoObservable } from "mobx";
+import { v4 as uuidv4 } from "uuid";
 
 // move api calls to another file
 const getMapByHash = async (hash) => {
@@ -73,9 +74,20 @@ export class PlaylistStore {
     }
   }
 
+  getNewId() {
+    let newId = uuidv4();
+
+    while (this.playlists.find((p) => p.id === newId)) {
+      newId = uuidv4();
+    }
+
+    return newId;
+  }
+
   createNewPlaylist() {
     const playlist = new Playlist(
       {
+        id: this.getNewId(),
         image: null,
         title: "New Playlist",
         author: "Beaterlist",
@@ -109,6 +121,7 @@ export class PlaylistStore {
     );
     const playlist = new Playlist(
       {
+        id: this.getNewId(),
         image: data.image,
         title: data.playlistTitle,
         author: data.playlistAuthor,
@@ -123,6 +136,7 @@ export class PlaylistStore {
 export const PlaylistStoreContext = createContext();
 
 export class Playlist {
+  _id = null;
   _image = null; // base64
   _title = "";
   _author = "";
@@ -132,11 +146,16 @@ export class Playlist {
 
   constructor(savedPlaylist, store) {
     makeAutoObservable(this);
+    this._id = savedPlaylist.id; // custom id
     this._image = savedPlaylist.image;
     this._title = savedPlaylist.title;
     this._author = savedPlaylist.author;
     this._songs = savedPlaylist.songs.map((song) => new Song(song));
     this.store = store;
+  }
+
+  get id() {
+    return this._id;
   }
 
   get image() {
@@ -208,6 +227,7 @@ export class Playlist {
 
   asJson() {
     return {
+      id: this._id,
       image: this.image,
       title: this.title,
       author: this.author,
