@@ -62,6 +62,7 @@ const App = () => {
       const songToAdd = beatSaverBrowserSongStore.songsList[source.index];
       console.log("hiyaya", songToAdd.hash);
       destinationPlaylist.addSongBySongData(songToAdd, destIdx);
+      playlistStore.saveAllPlaylists();
       return;
     }
 
@@ -80,8 +81,9 @@ const App = () => {
     // move within list
     if (destination.droppableId === source.droppableId) {
       const songToMove = sourcePlaylist.songs[sourceIdx];
-      sourcePlaylist.insertSongAtIdx(songToMove, destIdx);
       sourcePlaylist.removeSong(songToMove); // could be optimized, currently does extra search
+      sourcePlaylist.insertSongAtIdx(songToMove, destIdx);
+      console.log("moving within", songToMove, sourceIdx, destIdx);
     } else {
       // move across list
       const destinationPlaylist = playlistStore.playlists.find(
@@ -91,6 +93,7 @@ const App = () => {
       destinationPlaylist.insertSongAtIdx(songToMove, destIdx);
       sourcePlaylist.removeSong(songToMove);
     }
+    playlistStore.saveAllPlaylists();
   };
 
   return (

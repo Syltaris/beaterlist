@@ -47,11 +47,15 @@ const camelCaseToWords = (text) => {
   return finalResult;
 };
 
-const DraggableRow = ({ idx, song, onRemoveSongClick }) => {
+const DraggableRow = ({ idx, playlistId, song, onRemoveSongClick }) => {
   const preferences = useContext(UserPreferencesContext);
   const columnsToShow = preferences.getPlaylistColumnNamesToShow();
   return (
-    <Draggable key={song.hash} draggableId={song.hash} index={idx}>
+    <Draggable
+      key={song.hash}
+      draggableId={`${playlistId}-${song.hash}`}
+      index={idx}
+    >
       {(provided, snapshot) => (
         <Table.Row
           key={song.hash}
@@ -304,6 +308,7 @@ const PlaylistTable = ({ playlist }) => {
                 {playlist.songs.map((song, idx) => (
                   <DraggableRow
                     idx={idx}
+                    playlistId={playlist.id}
                     song={song}
                     onRemoveSongClick={(song) => setSongToRemove(song)}
                   />

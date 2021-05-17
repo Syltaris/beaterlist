@@ -221,12 +221,12 @@ export class Playlist {
   }
 
   removeSong(song) {
-    const idx = this.songs.indexOf(song);
-    this.songs.splice(idx, 1);
+    const idx = this._songs.indexOf(song);
+    this._songs.splice(idx, 1);
   }
 
   insertSongAtIdx(song, idx) {
-    this.songs.splice(idx, 0, song);
+    this._songs.splice(idx, 0, song);
   }
 
   async addSongByKey(songKey) {
@@ -237,7 +237,7 @@ export class Playlist {
       const resp = await getMapByKey(songKey);
       const songData = await resp.json();
       console.log(songData);
-      const duplicateSong = this.songs.find(
+      const duplicateSong = this._songs.find(
         (song) => song.hash === songData.hash
       );
       if (duplicateSong) {
