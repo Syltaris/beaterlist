@@ -25,7 +25,7 @@ export class BeatSaverSongCache {
   }
 
   async retrieveSongData(hash) {
-    if (!hash in this.songCache) {
+    if (!(hash in this.songCache)) {
       const resp = await getMapByHash(hash);
       this.songCache[hash] = resp;
     } // else, skip (unless needs to overwrite for some reason?)
@@ -48,7 +48,7 @@ export class BeatSaverSongCache {
   }
 
   getSongDataByHash(hash) {
-    if (!hash in this.songCache) {
+    if (!(hash in this.songCache)) {
       this.retrieveSongData(hash);
     }
     return this.songCache[hash];

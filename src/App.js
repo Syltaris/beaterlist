@@ -12,13 +12,14 @@ import { UserPreferencesContext } from "./stores/preferences";
 // persist config
 // delete playlist?
 // create playlists
-
 // add songs by hash?
+// playlist import to persist playlist
+
 // list to list exchanges
-// playlist import to persist playlist (import will need to do replacement checks)
-// playlist title edit collision check
 // load in playlist browser (beat saver), to drag playlists in
 // more columns, beautified difficulties
+// playlist title edit collision check
+// (import will need to do replacement checks)
 
 const App = () => {
   const preferences = useContext(UserPreferencesContext);
