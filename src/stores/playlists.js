@@ -83,6 +83,10 @@ export class PlaylistStore {
       },
       this
     );
+    this.appendPlaylist(playlist);
+  }
+
+  appendPlaylist(playlist) {
     this.playlists.push(playlist);
     this.saveAllPlaylists();
   }
@@ -112,9 +116,7 @@ export class PlaylistStore {
       },
       this
     );
-    this.playlists.push(playlist);
-
-    this.saveAllPlaylists();
+    this.appendPlaylist(playlist);
   };
 }
 
@@ -176,6 +178,10 @@ export class Playlist {
   removeSong(song) {
     const idx = this.songs.indexOf(song);
     this.songs.splice(idx, 1);
+  }
+
+  insertSongAtIdx(song, idx) {
+    this.songs.splice(idx, 0, song);
   }
 
   async addSongByKey(songKey) {

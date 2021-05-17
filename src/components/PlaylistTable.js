@@ -16,7 +16,7 @@ import {
   AddIcon,
   Spinner,
 } from "evergreen-ui";
-import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { Draggable, Droppable } from "react-beautiful-dnd";
 
 import { UserPreferencesContext } from "../stores/preferences";
 
@@ -130,23 +130,6 @@ const PlaylistTable = ({ playlist }) => {
 
   const preferences = useContext(UserPreferencesContext);
   const columnsToShow = preferences.getPlaylistColumnNamesToShow();
-
-  const onDragEnd = ({ destination, source }) => {
-    // the only one that is required
-    console.log(destination, source);
-    if (!destination || !source) {
-      return;
-    }
-
-    const destIdx = destination.index;
-    const sourceIdx = source.index;
-
-    const listToUpdate = [...playlist.songs];
-    const itemToInsert = listToUpdate[sourceIdx];
-    listToUpdate.splice(sourceIdx, 1);
-    listToUpdate.splice(destIdx, 0, itemToInsert);
-    playlist.songs = listToUpdate;
-  };
 
   const TYPE = "playlistSong"; //`${playlist.title}${playlist.author}`;
 
@@ -299,38 +282,36 @@ const PlaylistTable = ({ playlist }) => {
           ></TextInput>
         </Dialog>
       </Pane>
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Table maxWidth="80%">
-          <Table.Head height={42}>
-            <Table.HeaderCell flexBasis={40} flexGrow={0} />
-            <Table.HeaderCell flexBasis={60} flexGrow={0}>
-              Cover
+      <Table maxWidth="80%">
+        <Table.Head height={42}>
+          <Table.HeaderCell flexBasis={40} flexGrow={0} />
+          <Table.HeaderCell flexBasis={60} flexGrow={0}>
+            Cover
+          </Table.HeaderCell>
+          {columnsToShow.map((key) => (
+            <Table.HeaderCell key={key}>
+              {camelCaseToWords(key)}
             </Table.HeaderCell>
-            {columnsToShow.map((key) => (
-              <Table.HeaderCell key={key}>
-                {camelCaseToWords(key)}
-              </Table.HeaderCell>
-            ))}
-          </Table.Head>
-          <Table.Body>
-            <Droppable droppableId={playlist.title} type={TYPE}>
-              {(provided, snapshot) => (
-                <div ref={provided.innerRef}>
-                  {playlist.songs.map((song, idx) => (
-                    <DraggableRow
-                      type={TYPE}
-                      idx={idx}
-                      song={song}
-                      onRemoveSongClick={(song) => setSongToRemove(song)}
-                    />
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          </Table.Body>
-        </Table>
-      </DragDropContext>
+          ))}
+        </Table.Head>
+        <Table.Body>
+          <Droppable droppableId={playlist.title} type={TYPE}>
+            {(provided, snapshot) => (
+              <div ref={provided.innerRef}>
+                {playlist.songs.map((song, idx) => (
+                  <DraggableRow
+                    type={TYPE}
+                    idx={idx}
+                    song={song}
+                    onRemoveSongClick={(song) => setSongToRemove(song)}
+                  />
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </Table.Body>
+      </Table>
     </div>
   );
 };
