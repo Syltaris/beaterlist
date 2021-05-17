@@ -21,6 +21,9 @@ import { Draggable, Droppable } from "react-beautiful-dnd";
 import { UserPreferencesContext } from "../stores/preferences";
 
 const getColText = (key, song) => {
+  if (!song) {
+    return "";
+  }
   // special cases
   switch (key) {
     case "difficulties":
@@ -44,11 +47,11 @@ const camelCaseToWords = (text) => {
   return finalResult;
 };
 
-const DraggableRow = ({ type, idx, song, onRemoveSongClick }) => {
+const DraggableRow = ({ idx, song, onRemoveSongClick }) => {
   const preferences = useContext(UserPreferencesContext);
   const columnsToShow = preferences.getPlaylistColumnNamesToShow();
   return (
-    <Draggable key={song.hash} draggableId={song.hash} index={idx} type={type}>
+    <Draggable key={song.hash} draggableId={song.hash} index={idx}>
       {(provided, snapshot) => (
         <Table.Row
           key={song.hash}
@@ -130,8 +133,6 @@ const PlaylistTable = ({ playlist }) => {
 
   const preferences = useContext(UserPreferencesContext);
   const columnsToShow = preferences.getPlaylistColumnNamesToShow();
-
-  const TYPE = "playlistSong"; //`${playlist.title}${playlist.author}`;
 
   return (
     <div
@@ -294,7 +295,7 @@ const PlaylistTable = ({ playlist }) => {
           ))}
         </Table.Head>
         <Table.Body display="flex">
-          <Droppable droppableId={playlist.id} type={TYPE}>
+          <Droppable droppableId={playlist.id}>
             {(provided, snapshot) => (
               <div
                 ref={provided.innerRef}
@@ -302,7 +303,6 @@ const PlaylistTable = ({ playlist }) => {
               >
                 {playlist.songs.map((song, idx) => (
                   <DraggableRow
-                    type={TYPE}
                     idx={idx}
                     song={song}
                     onRemoveSongClick={(song) => setSongToRemove(song)}

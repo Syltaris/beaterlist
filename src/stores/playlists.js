@@ -12,6 +12,31 @@ const getMapByKey = async (songKey) => {
   return await fetch(`https://beatsaver.com/api/maps/detail/${songKey}`);
 };
 
+const getBeatSaverMapList = async (page, type = "hot") => {
+  return (await fetch(`https://beatsaver.com/api/maps/${type}/${page}`)).json();
+};
+
+// beat saver server songs
+export class BeatSaverBrowserStore {
+  _songsList = [];
+
+  constructor() {
+    makeAutoObservable(this);
+  }
+
+  fetchSongs = async (page) => {
+    const resp = await getBeatSaverMapList(page);
+    console.log(resp);
+    this._songsList = resp.docs;
+  };
+
+  get songsList() {
+    return this._songsList;
+  }
+}
+
+export const BeatSaverBrowserStoreContext = createContext();
+
 // stores a cache of beat-saver song data
 export class BeatSaverSongCache {
   songCache = null;
@@ -75,9 +100,10 @@ export class PlaylistStore {
   }
 
   getNewId() {
+    const allIds = [this.playlists.map((p) => p.id)];
     let newId = uuidv4();
 
-    while (this.playlists.find((p) => p.id === newId)) {
+    while (allIds.includes(newId)) {
       newId = uuidv4();
     }
 
@@ -219,6 +245,23 @@ export class Playlist {
       }
       beatSaverSongCache.manualAddSongData(songData);
       this._songs.push(new Song({ hash: songData.hash }));
+      this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async addSongBySongData(songData, idx = undefined) {
+    const hash = songData.hash;
+    if (idx === undefined) {
+      idx = this._songs.length;
+    }
+    try {
+      if (this._songs.find((s) => s.hash === hash)) {
+        return; // should show some dup error
+      }
+      beatSaverSongCache.manualAddSongData(songData);
+      this._songs.splice(idx, 0, new Song({ hash })); // let Song handle fetching
       this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
     } catch (err) {
       throw err;

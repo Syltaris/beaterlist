@@ -4,7 +4,12 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
-import { PlaylistStoreContext, PlaylistStore } from "./stores/playlists";
+import {
+  PlaylistStoreContext,
+  PlaylistStore,
+  BeatSaverBrowserStore,
+  BeatSaverBrowserStoreContext,
+} from "./stores/playlists";
 import {
   UserPreferencesContext,
   UserPreferencesStore,
@@ -13,9 +18,13 @@ import {
 ReactDOM.render(
   <React.StrictMode>
     <PlaylistStoreContext.Provider value={new PlaylistStore()}>
-      <UserPreferencesContext.Provider value={new UserPreferencesStore()}>
-        <App />
-      </UserPreferencesContext.Provider>
+      <BeatSaverBrowserStoreContext.Provider
+        value={new BeatSaverBrowserStore()}
+      >
+        <UserPreferencesContext.Provider value={new UserPreferencesStore()}>
+          <App />
+        </UserPreferencesContext.Provider>
+      </BeatSaverBrowserStoreContext.Provider>
     </PlaylistStoreContext.Provider>
   </React.StrictMode>,
   document.getElementById("root")

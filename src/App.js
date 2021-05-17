@@ -5,8 +5,12 @@ import { DragDropContext } from "react-beautiful-dnd";
 import { Pane, Heading, Checkbox, Button } from "evergreen-ui";
 import PlaylistTable from "./components/PlaylistTable";
 import PlaylistImporter from "./components/PlaylistImporter";
+import BeatSaverBrowser from "./components/BeatSaverBrowser";
 
-import { PlaylistStoreContext } from "./stores/playlists";
+import {
+  BeatSaverBrowserStoreContext,
+  PlaylistStoreContext,
+} from "./stores/playlists";
 import { UserPreferencesContext } from "./stores/preferences";
 
 // TodO:
@@ -32,6 +36,8 @@ const App = () => {
   const playlistStore = useContext(PlaylistStoreContext);
   const playlists = playlistStore.playlists;
 
+  const beatSaverBrowserSongStore = useContext(BeatSaverBrowserStoreContext);
+
   let filteredColumns = Object.entries(columnsToShow)
     .filter(([_, value]) => value)
     .map(([key, _]) => key);
@@ -45,9 +51,19 @@ const App = () => {
     if (!destination || !source) {
       return;
     }
-
     const destIdx = destination.index;
     const sourceIdx = source.index;
+
+    // beat saver browser logic
+    if (source.droppableId === "BEAT_SAVER_BROWSER") {
+      const destinationPlaylist = playlistStore.playlists.find(
+        (p) => p.id === destination.droppableId
+      );
+      const songToAdd = beatSaverBrowserSongStore.songsList[source.index];
+      console.log("hiyaya", songToAdd.hash);
+      destinationPlaylist.addSongBySongData(songToAdd, destIdx);
+      return;
+    }
 
     if (
       destination.droppableId === source.droppableId &&
@@ -144,7 +160,12 @@ const App = () => {
             Add new playlist
           </Button>
         </Pane>
+
         <DragDropContext onDragEnd={onDragEnd}>
+          <Pane>
+            <BeatSaverBrowser />
+          </Pane>
+
           <Pane
             width="100%"
             height="80vh"
