@@ -146,25 +146,24 @@ const PlaylistTable = ({ playlist }) => {
     >
       {" "}
       <Pane display="flex" flexDirection="row" alignItems="center">
-        {playlist.image && (
-          <Avatar
-            src={"data:image/png;" + playlist.image}
-            size={50}
-            onClick={() => {
-              // get image upload and replace image in base64
-              openFileDialog((event) => {
-                let baseURL = "";
-                const reader = new FileReader();
-                const file = event.target.files[0];
-                reader.readAsDataURL(file);
-                reader.onload = () => {
-                  baseURL = reader.result;
-                  playlist.image = baseURL;
-                };
-              });
-            }}
-          />
-        )}
+        <Avatar
+          src={playlist.image && "data:image/png;" + playlist.image}
+          name={playlist.title}
+          size={50}
+          onClick={() => {
+            // get image upload and replace image in base64
+            openFileDialog((event) => {
+              let baseURL = "";
+              const reader = new FileReader();
+              const file = event.target.files[0];
+              reader.readAsDataURL(file);
+              reader.onload = () => {
+                baseURL = reader.result;
+                playlist.image = baseURL;
+              };
+            });
+          }}
+        />
         <Heading margin={10}>
           {editTextData ? (
             <>
@@ -294,10 +293,13 @@ const PlaylistTable = ({ playlist }) => {
             </Table.HeaderCell>
           ))}
         </Table.Head>
-        <Table.Body>
+        <Table.Body display="flex">
           <Droppable droppableId={playlist.title} type={TYPE}>
             {(provided, snapshot) => (
-              <div ref={provided.innerRef}>
+              <div
+                ref={provided.innerRef}
+                style={{ flex: 1, minHeight: "40px" }}
+              >
                 {playlist.songs.map((song, idx) => (
                   <DraggableRow
                     type={TYPE}

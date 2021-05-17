@@ -76,7 +76,7 @@ export class PlaylistStore {
   createNewPlaylist() {
     const playlist = new Playlist(
       {
-        image: "",
+        image: null,
         title: "New Playlist",
         author: "Beaterlist",
         songs: [],
@@ -123,7 +123,7 @@ export class PlaylistStore {
 export const PlaylistStoreContext = createContext();
 
 export class Playlist {
-  _image = ""; // base64
+  _image = null; // base64
   _title = "";
   _author = "";
   _songs = []; // array of Songs

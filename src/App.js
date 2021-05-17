@@ -15,10 +15,10 @@ import { UserPreferencesContext } from "./stores/preferences";
 // create playlists
 // add songs by hash?
 // playlist import to persist playlist
+// list to list exchanges
 
 // image for new playlist
 // placeholder for empty playlist
-// list to list exchanges
 // load in playlist browser (beat saver), to drag playlists in
 // more columns, beautified difficulties
 // playlist title edit collision check
