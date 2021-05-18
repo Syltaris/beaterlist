@@ -23,6 +23,7 @@ class BeatSaverBrowserStore {
   _page = 0;
   _search = "";
   _category = beatSaverBrowserCategories[0];
+  _loading = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -31,6 +32,7 @@ class BeatSaverBrowserStore {
   }
 
   fetchSongs = async () => {
+    this.loading = true;
     let resp;
     try {
       if (this.search !== null && this.search !== "") {
@@ -44,6 +46,7 @@ class BeatSaverBrowserStore {
     console.log(resp);
     this.totalPages = resp.lastPage;
     this.songsList = resp.docs;
+    this.loading = false;
   };
 
   get songsList() {
@@ -63,6 +66,12 @@ class BeatSaverBrowserStore {
   }
   set page(page) {
     this._page = page;
+  }
+  get loading() {
+    return this._loading;
+  }
+  set loading(loading) {
+    this._loading = loading;
   }
   get category() {
     return this._category;

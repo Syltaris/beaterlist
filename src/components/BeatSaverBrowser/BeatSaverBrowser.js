@@ -46,7 +46,7 @@ const BeatSaverBrowser = () => {
         <Heading marginTop="10px" marginBottom="10px">
           BeatSaver Browser
         </Heading>
-        {loading && <Spinner marginLeft="auto" marginRight="0px" />}
+        {songStore.loading && <Spinner marginLeft="auto" marginRight="0px" />}
       </div>
       <Text>
         Drag songs from here to your playlists to add songs directly. Currently,

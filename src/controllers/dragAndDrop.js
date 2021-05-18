@@ -10,6 +10,10 @@ export const onDragEnd = ({ destination, source }) => {
   const destIdx = destination.index;
   const sourceIdx = source.index;
 
+  if (destination.droppableId === source.droppableId && destIdx === sourceIdx) {
+    return;
+  }
+
   // beat saver browser logic
   if (source.droppableId === "BEAT_SAVER_BROWSER") {
     const destinationPlaylist = playlistStore.playlists.find(
@@ -29,10 +33,6 @@ export const onDragEnd = ({ destination, source }) => {
   ) {
     const playlistToMove = playlistStore.playlists[source.index];
     playlistStore.movePlaylist(playlistToMove, destination.index);
-    return;
-  }
-
-  if (destination.droppableId === source.droppableId && destIdx === sourceIdx) {
     return;
   }
 
