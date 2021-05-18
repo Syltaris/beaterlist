@@ -10,7 +10,7 @@ const initColumnsToShow = () => {
   return output;
 };
 
-export class UserPreferencesStore {
+class UserPreferencesStore {
   _playlistsHorizontalMode = false;
   _playlistColumnsToShow = undefined;
 
@@ -27,7 +27,7 @@ export class UserPreferencesStore {
   }
   set playlistHorizontalMode(flag) {
     this._playlistsHorizontalMode = flag;
-    store.set("playlistHorizontalMode", flag);
+    store.set("playlistHorizontalMode", this._playlistsHorizontalMode);
   }
 
   get playlistColumnsToShow() {
@@ -53,4 +53,5 @@ export class UserPreferencesStore {
   }
 }
 
-export const UserPreferencesContext = createContext();
+export const userPreferencesStore = new UserPreferencesStore();
+export const UserPreferencesContext = createContext(userPreferencesStore);

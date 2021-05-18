@@ -4,24 +4,21 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 
-import {
-  PlaylistStoreContext,
-  PlaylistStore,
-  BeatSaverBrowserStore,
-  BeatSaverBrowserStoreContext,
-} from "./stores/playlists";
+import { PlaylistStoreContext, playlistStore } from "./stores/playlists";
 import {
   UserPreferencesContext,
-  UserPreferencesStore,
+  userPreferencesStore,
 } from "./stores/preferences";
+import {
+  BeatSaverBrowserStoreContext,
+  beatSaverBrowserStore,
+} from "./stores/beatSaver";
 
 ReactDOM.render(
   <React.StrictMode>
-    <PlaylistStoreContext.Provider value={new PlaylistStore()}>
-      <BeatSaverBrowserStoreContext.Provider
-        value={new BeatSaverBrowserStore()}
-      >
-        <UserPreferencesContext.Provider value={new UserPreferencesStore()}>
+    <PlaylistStoreContext.Provider value={playlistStore}>
+      <BeatSaverBrowserStoreContext.Provider value={beatSaverBrowserStore}>
+        <UserPreferencesContext.Provider value={userPreferencesStore}>
           <App />
         </UserPreferencesContext.Provider>
       </BeatSaverBrowserStoreContext.Provider>

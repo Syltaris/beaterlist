@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite";
 import { Table, Button } from "evergreen-ui";
 import { Draggable, Droppable } from "react-beautiful-dnd";
 
-import { BeatSaverBrowserStoreContext } from "../stores/playlists";
+import { BeatSaverBrowserStoreContext } from "../stores/beatSaver";
 
 const BeatSaverBrowser = () => {
   const [page, setPage] = useState(0);
@@ -30,7 +30,11 @@ const BeatSaverBrowser = () => {
             ref={provided.innerRef}
           >
             {songsList.map((s, idx) => (
-              <Draggable draggableId={`browser-${s.hash}`} index={idx}>
+              <Draggable
+                key={s.hash}
+                draggableId={`browser-${s.hash}`}
+                index={idx}
+              >
                 {(provided, snapshot) => (
                   <Table.Row
                     height={40}

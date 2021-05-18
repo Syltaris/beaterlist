@@ -1,5 +1,6 @@
 import React from "react";
 import { FilePicker } from "evergreen-ui";
+import { observer } from "mobx-react-lite";
 
 const PlaylistImporter = ({ onImportClick }) => (
   <FilePicker
@@ -21,4 +22,4 @@ const PlaylistImporter = ({ onImportClick }) => (
   />
 );
 
-export default PlaylistImporter;
+export default observer(PlaylistImporter);
