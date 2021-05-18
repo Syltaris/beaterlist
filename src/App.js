@@ -22,9 +22,14 @@ import { onDragEnd } from "./controllers/dragAndDrop";
 // placeholder for empty playlist
 // playlist title edit collision check
 // (import will need to do replacement checks)
-
 // load in playlist browser (beat saver), to drag playlists in
 // more columns, beautified difficulties
+
+// drag and drop cleanup
+// export all?
+// reorder playlists
+// sidebar should be 'fixed' (with browser)
+// play preview?
 
 const App = () => {
   const preferences = useContext(UserPreferencesContext);

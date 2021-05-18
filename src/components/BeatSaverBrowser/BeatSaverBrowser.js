@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useContext } from "react";
 import { observer, Observer } from "mobx-react-lite";
 
 import {
@@ -63,10 +63,13 @@ const BeatSaverBrowser = () => {
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
+            marginBottom: 10,
+            marginTop: 10,
           }}
         >
           <Select
             width="100px"
+            marginRight="30px"
             value={songStore.category}
             onChange={(e) => {
               songStore.search = "";
