@@ -15,6 +15,9 @@ import {
   Dialog,
   AddIcon,
   Spinner,
+  IconButton,
+  TickIcon,
+  CrossIcon,
 } from "evergreen-ui";
 
 const exportPlaylist = (playlist) => {
@@ -66,7 +69,7 @@ export const Header = ({ playlist }) => {
   const [titleInput, setTitleInput] = useState(playlist.title);
   const [authorInput, setAuthorInput] = useState(playlist.author);
   return (
-    <Pane display="flex" flexDirection="row" alignItems="center">
+    <Pane display="flex" flexDirection="row" alignItems="center" padding="5px">
       <Avatar
         src={playlist.image && "data:image/png;" + playlist.image}
         name={playlist.title}
@@ -90,14 +93,34 @@ export const Header = ({ playlist }) => {
           <>
             <TextInput
               value={titleInput}
-              width="150px"
+              width="100px"
               onChange={(e) => setTitleInput(e.target.value)}
             />{" "}
             -{" "}
             <TextInput
               value={authorInput}
-              width="150px"
+              width="100px"
               onChange={(e) => setAuthorInput(e.target.value)}
+            />
+            <IconButton
+              icon={TickIcon}
+              intent="success"
+              onClick={() => {
+                playlist.title = titleInput;
+                playlist.author = authorInput;
+                setEditTextData(false);
+              }}
+              marginLeft="2px"
+            />
+            <IconButton
+              icon={CrossIcon}
+              intent="danger"
+              onClick={() => {
+                setTitleInput(playlist.title);
+                setAuthorInput(playlist.author);
+                setEditTextData(false);
+              }}
+              marginLeft="2px"
             />
           </>
         ) : (
@@ -106,43 +129,36 @@ export const Header = ({ playlist }) => {
           </>
         )}
       </Heading>
-      <Tooltip content="Edit Title & Author">
-        {editTextData ? (
-          <>
-            <Button
-              intent="success"
-              onClick={() => {
-                playlist.title = titleInput;
-                playlist.author = authorInput;
-                setEditTextData(false);
-              }}
-            >
-              Save
-            </Button>
-            <Button
-              intent="danger"
-              onClick={() => {
-                setTitleInput(playlist.title);
-                setAuthorInput(playlist.author);
-                setEditTextData(false);
-              }}
-            >
-              Discard
-            </Button>
-          </>
-        ) : (
-          <EditIcon onClick={() => setEditTextData(true)} size={30} />
-        )}
-      </Tooltip>
-      <Tooltip content="Download">
-        <FloppyDiskIcon size={25} onClick={() => exportPlaylist(playlist)} />
-      </Tooltip>
-      <Tooltip content="Delete">
-        <DeleteIcon size={25} onClick={() => setShowDeleteConfirmation(true)} />
-      </Tooltip>
-      <Tooltip content="Add new song">
-        <AddIcon size={25} onClick={() => setShowAddDialog(true)} />
-      </Tooltip>
+      <div style={{ marginLeft: "auto", marginRight: 0 }}>
+        <Tooltip content="Edit Title & Author">
+          <IconButton
+            icon={EditIcon}
+            onClick={() => setEditTextData(!editTextData)}
+            marginRight="2px"
+          />
+        </Tooltip>
+        <Tooltip content="Download">
+          <IconButton
+            icon={FloppyDiskIcon}
+            marginRight="2px"
+            onClick={() => exportPlaylist(playlist)}
+          />
+        </Tooltip>
+        <Tooltip content="Delete">
+          <IconButton
+            icon={DeleteIcon}
+            marginRight="2px"
+            onClick={() => setShowDeleteConfirmation(true)}
+          />
+        </Tooltip>
+        <Tooltip content="Add new song">
+          <IconButton
+            icon={AddIcon}
+            marginRight="2px"
+            onClick={() => setShowAddDialog(true)}
+          />
+        </Tooltip>
+      </div>
       <Dialog
         /* this will vanish immediatetly on confirm, can consider moving out to global modals */
         isShown={showDeleteConfirmation}
