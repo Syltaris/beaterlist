@@ -85,14 +85,14 @@ export class Playlist {
       const resp = await getMapByKey(songKey);
       songData = await resp.json();
     } catch (err) {
-      throw `Could not retreive song with key: ${songKey}`;
+      throw Error(`Could not retreive song with key: ${songKey}`);
     }
 
     const duplicateSong = this._songs.find(
       (song) => song.hash === songData.hash
     );
     if (duplicateSong) {
-      throw "Song already exists in playlist.";
+      throw Error("Song already exists in playlist.");
     }
 
     beatSaverSongCache.manualAddSongData(songData);

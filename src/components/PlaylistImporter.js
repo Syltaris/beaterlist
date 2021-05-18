@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Button } from "evergreen-ui";
 import { observer } from "mobx-react-lite";
 

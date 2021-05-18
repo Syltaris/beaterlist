@@ -8,6 +8,7 @@ import {
   DeleteIcon,
   Dialog,
   Badge,
+  toaster,
 } from "evergreen-ui";
 import { Draggable, Droppable } from "react-beautiful-dnd";
 
@@ -224,6 +225,9 @@ export const SongList = ({ playlist }) => {
         onConfirm={() => {
           playlist.removeSong(songToRemove);
           setSongToRemove(null);
+          toaster.success(
+            `${songToRemove.name} deleted from ${playlist.title}.`
+          );
         }}
         confirmLabel={"Confirm"}
         intent="danger"

@@ -53,6 +53,13 @@ export const onDragEnd = ({ destination, source }) => {
       (p) => p.id === destination.droppableId
     );
     const songToMove = sourcePlaylist.songs[sourceIdx];
+
+    if (
+      destinationPlaylist.songs.find((song) => song.hash === songToMove.hash)
+    ) {
+      throw Error("Song already exists in this playlist.");
+    }
+
     sourcePlaylist.removeSong(songToMove);
     destinationPlaylist.insertSongAtIdx(songToMove, destIdx);
   }

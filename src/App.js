@@ -1,7 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { DragDropContext } from "react-beautiful-dnd";
 
-import { Pane } from "evergreen-ui";
+import { Pane, toaster } from "evergreen-ui";
 import PlaylistsContainer from "./components/PlaylistsContainer";
 import BeatSaverBrowser from "./components/BeatSaverBrowser";
 import Sidebar from "./components/Sidebar";
@@ -46,7 +46,16 @@ const App = () => {
           <Sidebar />
         </Pane>
 
-        <DragDropContext onDragEnd={onDragEnd}>
+        <DragDropContext
+          onDragEnd={(props) => {
+            try {
+              onDragEnd(props);
+            } catch (err) {
+              console.error(err);
+              toaster.danger(err.message);
+            }
+          }}
+        >
           <BeatSaverBrowser />
           <PlaylistsContainer />
         </DragDropContext>
