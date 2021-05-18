@@ -189,7 +189,7 @@ export const SongList = ({ playlist }) => {
 
   const [songToRemove, setSongToRemove] = useState(null);
   return (
-    <Table minWidth="300px" overflowX="scroll">
+    <Table minWidth="400px" overflowX="scroll">
       <Table.Head height={42}>
         <Table.HeaderCell flexBasis={40} flexGrow={0} />
         {columnsToShow.map((key) => (

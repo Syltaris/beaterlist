@@ -22,6 +22,9 @@ const bplistSongKeys = [
 const initColumnsToShow = () => {
   const output = {};
   bplistSongKeys.forEach((key) => (output[key] = false));
+  output["cover"] = true;
+  output["name"] = true;
+
   return output;
 };
 

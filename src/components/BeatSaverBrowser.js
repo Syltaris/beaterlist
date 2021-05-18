@@ -14,7 +14,7 @@ const BeatSaverBrowser = () => {
   useEffect(() => songStore.fetchSongs(page, "plays"), [page]);
 
   return (
-    <Table width="200px">
+    <Table width="400px">
       <Button onClick={songStore.fetchSongs}>Load</Button>
       <Table.Head height={42}>
         <Table.HeaderCell flexBasis={40} flexGrow={0} />
