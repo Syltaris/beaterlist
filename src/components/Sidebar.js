@@ -1,5 +1,12 @@
 import { useContext } from "react";
-import { Heading, Checkbox, Button, toaster } from "evergreen-ui";
+import {
+  Heading,
+  Checkbox,
+  Button,
+  toaster,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "evergreen-ui";
 import { observer } from "mobx-react-lite";
 
 import PlaylistImporter from "./PlaylistImporter";
@@ -49,10 +56,18 @@ export const Sidebar = () => {
           }}
           marginBottom="10px"
         >
-          {preferences.showBeatSaverBrowser
-            ? "Hide BeatSaver browser"
-            : "Show BeatSaver browser"}
-        </Button>{" "}
+          {preferences.showBeatSaverBrowser ? (
+            <>
+              Hide BeatSaver browser
+              <ChevronLeftIcon />
+            </>
+          ) : (
+            <>
+              Show BeatSaver browser
+              <ChevronRightIcon />
+            </>
+          )}
+        </Button>
       </div>
       <Heading>Playlists Config</Heading>
       <Checkbox

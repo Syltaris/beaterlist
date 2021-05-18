@@ -4,7 +4,7 @@ import { DragDropContext } from "react-beautiful-dnd";
 
 import { Pane, toaster } from "evergreen-ui";
 import PlaylistsContainer from "./components/PlaylistsContainer";
-import BeatSaverBrowser from "./components/BeatSaverBrowser";
+import BeatSaverBrowser from "./components/BeatSaverBrowser/";
 import { UserPreferencesContext } from "./stores/preferences";
 import Sidebar from "./components/Sidebar";
 import TopNavbar from "./components/TopNavbar";

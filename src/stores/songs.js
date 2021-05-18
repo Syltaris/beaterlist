@@ -4,9 +4,15 @@ export class Song {
   _hash = null; // unique id
   beatSaverSongObject = undefined; // data object retrieve from beat-saver server
 
-  constructor(savedSong) {
+  constructor(savedSong, songData = null) {
     this._hash = savedSong.hash;
-    this.beatSaverSongObject = beatSaverSongCache.getSongDataByHash(this.hash);
+    if (songData === null) {
+      this.beatSaverSongObject = beatSaverSongCache.getSongDataByHash(
+        this.hash
+      );
+    } else {
+      this.beatSaverSongObject = songData;
+    }
   }
 
   get hash() {
