@@ -25,9 +25,7 @@ const PlaylistsViewer = observer(({ userPreferences, playlistStore }) => (
       height: "80vh",
       display: "flex",
       flexDirection: userPreferences.playlistHorizontalMode ? "row" : "column",
-      //justifyContent:"center"
       border: "default",
-      //overflowX:"scroll"
     }}
   >
     {playlistStore.playlists.map((playlist, idx) => (

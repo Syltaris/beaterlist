@@ -30,7 +30,11 @@ const getDifficultyBadge = (difficultyKey) => {
     return;
   }
   const { text, color } = difficultyBadgePropsMap[difficultyKey];
-  return <Badge color={color}>{text}</Badge>;
+  return (
+    <Badge key={difficultyKey} color={color}>
+      {text}
+    </Badge>
+  );
 };
 
 const getColText = (key, song) => {
@@ -94,7 +98,7 @@ const getTableCellPropsForCol = (key) => {
 const getTableCellForCol = (key, song) => {
   if (key === "cover") {
     return (
-      <Table.Cell {...getTableCellPropsForCol(key)}>
+      <Table.Cell key={key} {...getTableCellPropsForCol(key)}>
         <Avatar src={song.coverURL} size={40} />
       </Table.Cell>
     );
@@ -102,7 +106,7 @@ const getTableCellForCol = (key, song) => {
 
   if (key === "difficulties") {
     return (
-      <Table.Cell {...getTableCellPropsForCol(key)}>
+      <Table.Cell key={key} {...getTableCellPropsForCol(key)}>
         {Object.entries(song.difficulties)
           .filter(([_, flag]) => flag)
           .map(([difficultyKey, _]) => difficultyKey)
@@ -207,6 +211,7 @@ export const SongList = ({ playlist }) => {
             <div ref={provided.innerRef} style={{ minHeight: "40px" }}>
               {playlist.songs.map((song, idx) => (
                 <DraggableRow
+                  key={song.hash}
                   idx={idx}
                   playlistId={playlist.id}
                   song={song}

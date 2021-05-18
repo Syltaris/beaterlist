@@ -28,7 +28,6 @@ export const Sidebar = () => {
         >
           Add new playlist
         </Button>
-
         <PlaylistImporter
           marginBottom="10px"
           onImportClick={async (playlists) => {
@@ -43,6 +42,17 @@ export const Sidebar = () => {
             );
           }}
         />
+        <Button
+          onClick={() => {
+            preferences.showBeatSaverBrowser =
+              !preferences.showBeatSaverBrowser;
+          }}
+          marginBottom="10px"
+        >
+          {preferences.showBeatSaverBrowser
+            ? "Hide BeatSaver browser"
+            : "Show BeatSaver browser"}
+        </Button>{" "}
       </div>
       <Heading>Playlists Config</Heading>
       <Checkbox

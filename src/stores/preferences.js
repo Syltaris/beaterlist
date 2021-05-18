@@ -28,6 +28,7 @@ const initColumnsToShow = () => {
 class UserPreferencesStore {
   _playlistsHorizontalMode = false;
   _playlistColumnsToShow = undefined;
+  _showBeatSaverBrowser = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -35,6 +36,7 @@ class UserPreferencesStore {
       store.get("playlistHorizontalMode") || false;
     this._playlistColumnsToShow =
       store.get("playlistColumnsToShow") || initColumnsToShow();
+    this._showBeatSaverBrowser = store.get("showBeatSaverBrowser") || false;
   }
 
   get playlistHorizontalMode() {
@@ -51,6 +53,17 @@ class UserPreferencesStore {
   set playlistColumnsToShow(columns) {
     this._playlistColumnsToShow = columns;
     store.set("playlistColumnsToShow", this._playlistColumnsToShow); // probably can autorun the save function
+  }
+
+  get showBeatSaverBrowser() {
+    return this._showBeatSaverBrowser;
+  }
+  set showBeatSaverBrowser(flag) {
+    this._showBeatSaverBrowser = flag;
+    this._showBeatSaverBrowser = store.set(
+      "showBeatSaverBrowser",
+      this._showBeatSaverBrowser
+    );
   }
 
   setPlaylistColumnToShow(key, flag) {

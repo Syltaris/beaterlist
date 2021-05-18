@@ -1,9 +1,11 @@
+import { useContext } from "react";
 import { observer } from "mobx-react-lite";
 import { DragDropContext } from "react-beautiful-dnd";
 
 import { Pane, toaster } from "evergreen-ui";
 import PlaylistsContainer from "./components/PlaylistsContainer";
 import BeatSaverBrowser from "./components/BeatSaverBrowser";
+import { UserPreferencesContext } from "./stores/preferences";
 import Sidebar from "./components/Sidebar";
 import TopNavbar from "./components/TopNavbar";
 
@@ -25,6 +27,7 @@ import { onDragEnd } from "./controllers/dragAndDrop";
 // more columns, beautified difficulties
 
 const App = () => {
+  const preferences = useContext(UserPreferencesContext);
   return (
     <Pane
       width="100%"
@@ -56,7 +59,7 @@ const App = () => {
             }
           }}
         >
-          <BeatSaverBrowser />
+          {preferences.showBeatSaverBrowser && <BeatSaverBrowser />}
           <PlaylistsContainer />
         </DragDropContext>
       </div>
