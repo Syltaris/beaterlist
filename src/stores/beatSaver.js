@@ -12,8 +12,8 @@ class BeatSaverBrowserStore {
     makeAutoObservable(this);
   }
 
-  fetchSongs = async (page) => {
-    const resp = await getBeatSaverMapList(page);
+  fetchSongs = async (page, type) => {
+    const resp = await getBeatSaverMapList(page, type);
     console.log(resp);
     this.songsList = resp.docs;
   };

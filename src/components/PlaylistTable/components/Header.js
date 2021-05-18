@@ -61,7 +61,7 @@ export const Header = ({ playlist }) => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [showAddSongLoader, setShowAddSongLoader] = useState(false);
   const [addSongError, setAddSongError] = useState(false);
-  const [songKeyInput, setSongKeyInput] = useState(undefined);
+  const [songKeyInput, setSongKeyInput] = useState("");
 
   const [titleInput, setTitleInput] = useState(playlist.title);
   const [authorInput, setAuthorInput] = useState(playlist.author);

@@ -8,6 +8,8 @@ import { UserPreferencesContext } from "../stores/preferences";
 
 import { PlaylistStoreContext } from "../stores/playlists";
 
+import { camelCaseToWords } from "../utils/string";
+
 export const Sidebar = () => {
   const preferences = useContext(UserPreferencesContext);
   const horizontalMode = preferences.playlistHorizontalMode;
@@ -29,7 +31,7 @@ export const Sidebar = () => {
       {Object.keys(preferences.playlistColumnsToShow).map((key) => (
         <Checkbox
           key={key}
-          label={key}
+          label={camelCaseToWords(key)}
           checked={columnsToShow[key]}
           onChange={(e) =>
             preferences.setPlaylistColumnToShow(key, e.target.checked)

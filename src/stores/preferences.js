@@ -2,7 +2,22 @@ import { createContext } from "react";
 import store from "store";
 import { makeAutoObservable } from "mobx";
 
-const bplistSongKeys = ["name", "description", "difficulties"];
+const bplistSongKeys = [
+  "cover",
+  "name",
+  "songAuthor",
+  "levelAuthor",
+  "difficulties",
+  "downloads",
+  "plays",
+  "upvotes",
+  "downvotes",
+  "rating",
+  "uploadDate",
+  "key",
+  "hash",
+  "description",
+];
 
 const initColumnsToShow = () => {
   const output = {};

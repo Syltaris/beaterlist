@@ -1,18 +1,25 @@
 import { beatSaverSongCache } from "./beatSaver";
 
 export class Song {
-  hash = null; // unique id
+  _hash = null; // unique id
   beatSaverSongObject = undefined; // data object retrieve from beat-saver server
 
   constructor(savedSong) {
-    this.hash = savedSong.hash;
+    this._hash = savedSong.hash;
     this.beatSaverSongObject = beatSaverSongCache.getSongDataByHash(this.hash);
   }
 
+  get hash() {
+    return this._hash;
+  }
+
+  get coverURL() {
+    return "https://beatsaver.com" + this.beatSaverSongObject?.coverURL;
+  }
   get name() {
     return this.beatSaverSongObject?.metadata.songName;
   }
-  get author() {
+  get songAuthor() {
     return this.beatSaverSongObject?.metadata.songAuthorName;
   }
   get levelAuthor() {
@@ -24,8 +31,29 @@ export class Song {
   get description() {
     return this.beatSaverSongObject?.description;
   }
-  get coverURL() {
-    return "https://beatsaver.com" + this.beatSaverSongObject?.coverURL;
+
+  get downloads() {
+    return this.beatSaverSongObject?.stats.downloads;
+  }
+  get plays() {
+    return this.beatSaverSongObject?.stats.plays;
+  }
+  get upvotes() {
+    return this.beatSaverSongObject?.stats.upVotes;
+  }
+  get downvotes() {
+    return this.beatSaverSongObject?.stats.downVotes;
+  }
+  get rating() {
+    return Number.parseFloat(
+      this.beatSaverSongObject?.stats.rating * 100 ?? 0.0
+    ).toPrecision(2);
+  }
+  get uploadDate() {
+    return new Date(this.beatSaverSongObject?.uploaded).toLocaleDateString();
+  }
+  get key() {
+    return this.beatSaverSongObject?.key;
   }
 
   asJson() {

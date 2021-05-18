@@ -12,10 +12,9 @@ import { Draggable, Droppable } from "react-beautiful-dnd";
 
 import { UserPreferencesContext } from "../../../stores/preferences";
 
+import { camelCaseToWords } from "../../../utils/string";
+
 const getColText = (key, song) => {
-  if (!song) {
-    return "";
-  }
   // special cases
   switch (key) {
     case "difficulties":
@@ -33,10 +32,69 @@ const getColText = (key, song) => {
   }
 };
 
-const camelCaseToWords = (text) => {
-  var result = text.replace(/([A-Z])/g, " $1");
-  var finalResult = result.charAt(0).toUpperCase() + result.slice(1);
-  return finalResult;
+const getTableCellPropsForCol = (key) => {
+  let props = {
+    flexBasis: 120,
+    flexGrow: 0,
+  };
+  if (key === "description") {
+    props = {
+      flexBasis: 100,
+    };
+  } else if (key === "cover") {
+    return {
+      flexBasis: 60,
+      flexGrow: 0,
+    };
+  } else if (
+    ["downloads", "plays", "upvotes", "downvotes", "rating", "key"].includes(
+      key
+    )
+  ) {
+    // small width cells
+    props = {
+      flexBasis: 72,
+      flexGrow: 0,
+    };
+  }
+
+  return props;
+};
+
+const getTableCellForCol = (key, song) => {
+  if (key === "cover") {
+    return (
+      <Table.Cell {...getTableCellPropsForCol(key)}>
+        <Avatar src={song.coverURL} size={40} />
+      </Table.Cell>
+    );
+  }
+
+  return (
+    <Table.TextCell key={key} {...getTableCellPropsForCol(key)}>
+      {getColText(key, song)}
+    </Table.TextCell>
+  );
+};
+
+const getColHeaderText = (key) => {
+  // to handle special small width text
+  switch (key) {
+    case "upvotes":
+      return "👍";
+    case "downvotes":
+      return "👎";
+    case "downloads":
+      return "💾";
+    case "plays":
+      return "▶️";
+    case "rating":
+      return "💯";
+    case "key":
+      return "🔑";
+    default:
+      return camelCaseToWords(key);
+  }
 };
 
 const DraggableRow = ({ idx, playlistId, song, onRemoveSongClick }) => {
@@ -53,6 +111,7 @@ const DraggableRow = ({ idx, playlistId, song, onRemoveSongClick }) => {
           key={song.hash}
           isSelectable
           height={42}
+          maxWidth="100%"
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
@@ -60,12 +119,7 @@ const DraggableRow = ({ idx, playlistId, song, onRemoveSongClick }) => {
           <Table.Cell flexBasis={40} flexGrow={0}>
             <DragHandleHorizontalIcon />
           </Table.Cell>
-          <Table.Cell flexBasis={60} flexGrow={0}>
-            <Avatar src={song.coverURL} size={40} />
-          </Table.Cell>
-          {columnsToShow.map((key) => (
-            <Table.TextCell key={key}>{getColText(key, song)}</Table.TextCell>
-          ))}
+          {columnsToShow.map((key) => getTableCellForCol(key, song))}
           <Table.Cell flexBasis={35} flexGrow={0}>
             <DeleteIcon onClick={() => onRemoveSongClick(song)} />
           </Table.Cell>
@@ -81,14 +135,13 @@ export const SongList = ({ playlist }) => {
 
   const [songToRemove, setSongToRemove] = useState(null);
   return (
-    <Table maxWidth="80%">
+    <Table maxWidth="100%">
       <Table.Head height={42}>
         <Table.HeaderCell flexBasis={40} flexGrow={0} />
-        <Table.HeaderCell flexBasis={60} flexGrow={0}>
-          Cover
-        </Table.HeaderCell>
         {columnsToShow.map((key) => (
-          <Table.HeaderCell key={key}>{camelCaseToWords(key)}</Table.HeaderCell>
+          <Table.HeaderCell key={key} {...getTableCellPropsForCol(key)}>
+            {getColHeaderText(key)}
+          </Table.HeaderCell>
         ))}
       </Table.Head>
       <Table.Body display="flex">

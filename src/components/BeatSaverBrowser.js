@@ -11,7 +11,7 @@ const BeatSaverBrowser = () => {
   const songStore = useContext(BeatSaverBrowserStoreContext);
   const songsList = songStore.songsList;
 
-  useEffect(() => songStore.fetchSongs(page), [page]);
+  useEffect(() => songStore.fetchSongs(page, "plays"), [page]);
 
   return (
     <Table width="200px">
