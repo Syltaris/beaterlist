@@ -32,7 +32,6 @@ const App = () => {
       display="flex"
       flexDirection="column"
       alignItems="center"
-      //justifyContent="center"
       border="default"
     >
       <TopNavbar />

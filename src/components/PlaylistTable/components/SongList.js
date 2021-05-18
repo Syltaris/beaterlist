@@ -7,12 +7,30 @@ import {
   DragHandleHorizontalIcon,
   DeleteIcon,
   Dialog,
+  Badge,
 } from "evergreen-ui";
 import { Draggable, Droppable } from "react-beautiful-dnd";
 
 import { UserPreferencesContext } from "../../../stores/preferences";
 
 import { camelCaseToWords } from "../../../utils/string";
+
+const difficultyBadgePropsMap = {
+  easy: { text: "EZ", color: "green" },
+  normal: { text: "N", color: "blue" },
+  hard: { text: "H", color: "yellow" },
+  expert: { text: "E", color: "red" },
+  expertPlus: { text: "E+", color: "purple" },
+};
+
+const getDifficultyBadge = (difficultyKey) => {
+  if (!(difficultyKey in difficultyBadgePropsMap)) {
+    console.error("missing difficulty key: ", difficultyKey);
+    return;
+  }
+  const { text, color } = difficultyBadgePropsMap[difficultyKey];
+  return <Badge color={color}>{text}</Badge>;
+};
 
 const getColText = (key, song) => {
   // special cases
@@ -77,6 +95,21 @@ const getTableCellForCol = (key, song) => {
     return (
       <Table.Cell {...getTableCellPropsForCol(key)}>
         <Avatar src={song.coverURL} size={40} />
+      </Table.Cell>
+    );
+  }
+
+  if (key === "difficulties") {
+    return (
+      <Table.Cell {...getTableCellPropsForCol(key)}>
+        {Object.entries(song.difficulties)
+          .filter(([_, flag]) => flag)
+          .map(([difficultyKey, _]) => difficultyKey)
+          .sort((k1, k2) => {
+            const difficultyKeys = Object.keys(difficultyBadgePropsMap);
+            return difficultyKeys.indexOf(k1) - difficultyKeys.indexOf(k2);
+          })
+          .map((difficultyKey) => getDifficultyBadge(difficultyKey))}
       </Table.Cell>
     );
   }

@@ -85,6 +85,7 @@ export const Header = ({ playlist }) => {
             reader.onload = () => {
               baseURL = reader.result;
               playlist.image = baseURL;
+              toaster.success("Image saved and updated.");
             };
           });
         }}
