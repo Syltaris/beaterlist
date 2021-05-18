@@ -37,7 +37,6 @@ const App = () => {
       alignItems="center"
       border="default"
     >
-      <TopNavbar />
       <div
         style={{
           width: "100%",
@@ -45,7 +44,8 @@ const App = () => {
           display: "flex",
         }}
       >
-        <Pane minWidth="300px" padding={30}>
+        <Pane minWidth="300px">
+          <TopNavbar />
           <Sidebar />
         </Pane>
 

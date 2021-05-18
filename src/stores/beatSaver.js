@@ -2,28 +2,85 @@ import { createContext } from "react";
 import store from "store";
 
 import { makeAutoObservable } from "mobx";
-import { getBeatSaverMapList, getMapByHash } from "../controllers/api";
+import {
+  getBeatSaverMapList,
+  getMapByHash,
+  searchBeatSaverMapList,
+} from "../controllers/api";
+
+export const beatSaverBrowserCategories = [
+  "hot",
+  "rating",
+  "latest",
+  "downloads",
+  "plays",
+];
 
 // beat saver server songs
 class BeatSaverBrowserStore {
   _songsList = [];
+  _totalPages = null;
+  _page = 0;
+  _search = "";
+  _category = beatSaverBrowserCategories[0];
 
   constructor() {
     makeAutoObservable(this);
+
+    this.fetchSongs();
   }
 
-  fetchSongs = async (page, type) => {
-    const resp = await getBeatSaverMapList(page, type);
+  fetchSongs = async () => {
+    let resp;
+    try {
+      if (this.search !== null && this.search !== "") {
+        resp = await searchBeatSaverMapList(this.page, this.search);
+      } else {
+        resp = await getBeatSaverMapList(this.page, this.category);
+      }
+    } catch (err) {
+      throw err;
+    }
     console.log(resp);
+    this.totalPages = resp.lastPage;
     this.songsList = resp.docs;
   };
 
   get songsList() {
     return this._songsList;
   }
-
   set songsList(songsList) {
     this._songsList = songsList;
+  }
+  get totalPages() {
+    return this._totalPages;
+  }
+  set totalPages(totalPages) {
+    this._totalPages = totalPages;
+  }
+  get page() {
+    return this._page;
+  }
+  set page(page) {
+    this._page = page;
+  }
+  get category() {
+    return this._category;
+  }
+  set category(category) {
+    if (category !== this._category) {
+      this.page = 0;
+    }
+    this._category = category;
+  }
+  get search() {
+    return this._search;
+  }
+  set search(search) {
+    if (search !== this._search) {
+      this.page = 0;
+    }
+    this._search = search;
   }
 }
 

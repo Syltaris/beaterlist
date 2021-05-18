@@ -24,8 +24,39 @@ export const Sidebar = () => {
 
   const playlistStore = useContext(PlaylistStoreContext);
   return (
-    <>
-      <div style={{ display: "flex", flexDirection: "column" }}>
+    <div
+      style={{
+        paddingLeft: 30,
+        paddingRight: 30,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          paddingTop: 20,
+          paddingBottom: 20,
+        }}
+      >
+        <Button
+          onClick={() => {
+            preferences.showBeatSaverBrowser =
+              !preferences.showBeatSaverBrowser;
+          }}
+          marginBottom="10px"
+        >
+          {preferences.showBeatSaverBrowser ? (
+            <>
+              Hide BeatSaver browser
+              <ChevronLeftIcon />
+            </>
+          ) : (
+            <>
+              Show BeatSaver browser
+              <ChevronRightIcon />
+            </>
+          )}
+        </Button>
         <Button
           onClick={() => {
             playlistStore.createNewPlaylist();
@@ -49,25 +80,6 @@ export const Sidebar = () => {
             );
           }}
         />
-        <Button
-          onClick={() => {
-            preferences.showBeatSaverBrowser =
-              !preferences.showBeatSaverBrowser;
-          }}
-          marginBottom="10px"
-        >
-          {preferences.showBeatSaverBrowser ? (
-            <>
-              Hide BeatSaver browser
-              <ChevronLeftIcon />
-            </>
-          ) : (
-            <>
-              Show BeatSaver browser
-              <ChevronRightIcon />
-            </>
-          )}
-        </Button>
       </div>
       <Heading>Playlists Config</Heading>
       <Checkbox
@@ -89,7 +101,7 @@ export const Sidebar = () => {
           }
         />
       ))}
-    </>
+    </div>
   );
 };
 
