@@ -76,25 +76,30 @@ export class Playlist {
   }
 
   async addSongByKey(songKey) {
-    // try to find song in beat-saver
-    // if have, save the data, and the song, save the playlist after
-    // if not, do nothing
+    /* try to find song in beat-saver
+     if have, save the data, and the song, save the playlist after
+     if not, do nothing
+     */
+    let songData;
     try {
       const resp = await getMapByKey(songKey);
-      const songData = await resp.json();
-      console.log(songData);
-      const duplicateSong = this._songs.find(
-        (song) => song.hash === songData.hash
-      );
-      if (duplicateSong) {
-        return; // should show some error here tho
-      }
-      beatSaverSongCache.manualAddSongData(songData);
-      this._songs.push(new Song({ hash: songData.hash }));
-      this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
+      songData = await resp.json();
     } catch (err) {
-      throw err;
+      throw `Could not retreive song with key: ${songKey}`;
     }
+
+    const duplicateSong = this._songs.find(
+      (song) => song.hash === songData.hash
+    );
+    if (duplicateSong) {
+      throw "Song already exists in playlist.";
+    }
+
+    beatSaverSongCache.manualAddSongData(songData);
+    this._songs.push(new Song({ hash: songData.hash }));
+    this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
+
+    return songData;
   }
 
   async addSongBySongData(songData, idx = undefined) {

@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Heading, Checkbox, Button } from "evergreen-ui";
+import { Heading, Checkbox, Button, toaster } from "evergreen-ui";
 import { observer } from "mobx-react-lite";
 
 import PlaylistImporter from "./PlaylistImporter";
@@ -18,6 +18,32 @@ export const Sidebar = () => {
   const playlistStore = useContext(PlaylistStoreContext);
   return (
     <>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <Button
+          onClick={() => {
+            playlistStore.createNewPlaylist();
+            toaster.success("New Playlist created.");
+          }}
+          marginBottom="10px"
+        >
+          Add new playlist
+        </Button>
+
+        <PlaylistImporter
+          marginBottom="10px"
+          onImportClick={async (playlists) => {
+            const promises = playlists.map((playlist) =>
+              playlistStore.addPlaylistFromBplistData(playlist.data)
+            );
+            const out = await Promise.all(promises); // can check type here
+            toaster.success(
+              `Successfully imported ${out.length} playlist${
+                out.length === 1 ? "" : "s"
+              }.`
+            );
+          }}
+        />
+      </div>
       <Heading>Playlists Config</Heading>
       <Checkbox
         label="Horizontal Mode"
@@ -38,19 +64,6 @@ export const Sidebar = () => {
           }
         />
       ))}
-
-      <PlaylistImporter
-        onImportClick={async (playlists) => {
-          const promises = playlists.map((playlist) =>
-            playlistStore.addPlaylistFromBplistData(playlist.data)
-          );
-          const out = await Promise.all(promises); // can check type here
-          console.log(playlists, "plist", out, promises);
-        }}
-      />
-      <Button onClick={() => playlistStore.createNewPlaylist()}>
-        Add new playlist
-      </Button>
     </>
   );
 };

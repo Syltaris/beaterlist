@@ -10,7 +10,6 @@ import {
   Tooltip,
   TextInput,
   Pane,
-  Button,
   DeleteIcon,
   Dialog,
   AddIcon,
@@ -18,6 +17,8 @@ import {
   IconButton,
   TickIcon,
   CrossIcon,
+  Text,
+  toaster,
 } from "evergreen-ui";
 
 const exportPlaylist = (playlist) => {
@@ -102,26 +103,30 @@ export const Header = ({ playlist }) => {
               width="100px"
               onChange={(e) => setAuthorInput(e.target.value)}
             />
-            <IconButton
-              icon={TickIcon}
-              intent="success"
-              onClick={() => {
-                playlist.title = titleInput;
-                playlist.author = authorInput;
-                setEditTextData(false);
-              }}
-              marginLeft="2px"
-            />
-            <IconButton
-              icon={CrossIcon}
-              intent="danger"
-              onClick={() => {
-                setTitleInput(playlist.title);
-                setAuthorInput(playlist.author);
-                setEditTextData(false);
-              }}
-              marginLeft="2px"
-            />
+            <Tooltip content="Save/Confirm">
+              <IconButton
+                icon={TickIcon}
+                intent="success"
+                onClick={() => {
+                  playlist.title = titleInput;
+                  playlist.author = authorInput;
+                  setEditTextData(false);
+                }}
+                marginLeft="2px"
+              />
+            </Tooltip>
+            <Tooltip content="Discard Changes">
+              <IconButton
+                icon={CrossIcon}
+                intent="danger"
+                onClick={() => {
+                  setTitleInput(playlist.title);
+                  setAuthorInput(playlist.author);
+                  setEditTextData(false);
+                }}
+                marginLeft="2px"
+              />
+            </Tooltip>
           </>
         ) : (
           <>
@@ -166,6 +171,7 @@ export const Header = ({ playlist }) => {
         onCloseComplete={() => setShowDeleteConfirmation(false)}
         onConfirm={() => {
           playlist.delete();
+          toaster.success(`${playlist.title} deleted successfully.`);
           setShowDeleteConfirmation(false);
         }}
         confirmLabel={"Confirm"}
@@ -183,10 +189,13 @@ export const Header = ({ playlist }) => {
           try {
             setAddSongError(false);
             setShowAddSongLoader(true);
-            await playlist.addSongByKey(songKeyInput);
+            const addedSongData = await playlist.addSongByKey(songKeyInput);
+            toaster.success(
+              `${addedSongData.name} added to ${playlist.title}.`
+            );
           } catch (err) {
             setAddSongError(true);
-            console.log(err);
+            toaster.danger(err);
           } finally {
             setShowAddSongLoader(false);
           }
@@ -194,8 +203,10 @@ export const Header = ({ playlist }) => {
         confirmLabel={"Add"}
       >
         {showAddSongLoader && <Spinner />}
-        Add the song key you want to add here:
+        <Text>Add the song key 🔑 you want to add here:</Text>
         <TextInput
+          marginLeft="10px"
+          width="80px"
           isInvalid={addSongError}
           value={songKeyInput}
           onChange={(e) => setSongKeyInput(e.target.value)}
