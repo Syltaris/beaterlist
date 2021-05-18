@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { observer } from "mobx-react-lite";
 import { DragDropContext } from "react-beautiful-dnd";
 
-import { Pane, toaster } from "evergreen-ui";
+import { toaster } from "evergreen-ui";
 import PlaylistsContainer from "./components/PlaylistsContainer";
 import BeatSaverBrowser from "./components/BeatSaverBrowser/";
 import { UserPreferencesContext } from "./stores/preferences";
@@ -29,13 +29,15 @@ import { onDragEnd } from "./controllers/dragAndDrop";
 const App = () => {
   const preferences = useContext(UserPreferencesContext);
   return (
-    <Pane
-      width="100%"
-      height="100vh"
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      border="default"
+    <div
+      style={{
+        width: "100%",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        border: "default",
+      }}
     >
       <div
         style={{
@@ -44,10 +46,10 @@ const App = () => {
           display: "flex",
         }}
       >
-        <Pane minWidth="300px">
+        <div style={{ minWidth: 300 }}>
           <TopNavbar />
           <Sidebar />
-        </Pane>
+        </div>
 
         <DragDropContext
           onDragEnd={(props) => {
@@ -63,7 +65,7 @@ const App = () => {
           <PlaylistsContainer />
         </DragDropContext>
       </div>
-    </Pane>
+    </div>
   );
 };
 

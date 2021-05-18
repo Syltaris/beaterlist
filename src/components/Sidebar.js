@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import {
   Heading,
   Checkbox,
@@ -23,6 +23,8 @@ export const Sidebar = () => {
   const columnsToShow = preferences.playlistColumnsToShow;
 
   const playlistStore = useContext(PlaylistStoreContext);
+
+  const [loading, setLoading] = useState(false);
   return (
     <div
       style={{
@@ -67,12 +69,15 @@ export const Sidebar = () => {
           Add new playlist
         </Button>
         <PlaylistImporter
+          isLoading={loading}
           marginBottom="10px"
           onImportClick={async (playlists) => {
             const promises = playlists.map((playlist) =>
               playlistStore.addPlaylistFromBplistData(playlist.data)
             );
+            setLoading(true);
             const out = await Promise.all(promises); // can check type here
+            setLoading(false);
             toaster.success(
               `Successfully imported ${out.length} playlist${
                 out.length === 1 ? "" : "s"

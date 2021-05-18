@@ -30,7 +30,6 @@ import { Song } from "../../stores/songs";
 
 const BeatSaverBrowser = () => {
   const songStore = useContext(BeatSaverBrowserStoreContext);
-  const [loading, setLoading] = useState(false);
 
   const preferences = useContext(UserPreferencesContext);
   const columnsToShow = preferences.getPlaylistColumnNamesToShow();
@@ -72,9 +71,7 @@ const BeatSaverBrowser = () => {
             onChange={(e) => {
               songStore.search = "";
               songStore.category = e.target.value;
-              setLoading(true);
               songStore.fetchSongs();
-              setLoading(false);
             }}
           >
             {beatSaverBrowserCategories.map((c) => (
@@ -92,12 +89,10 @@ const BeatSaverBrowser = () => {
             onKeyPress={(e) => {
               if (e.key === "Enter") {
                 try {
-                  setLoading(true);
                   songStore.fetchSongs();
                 } catch (err) {
                   toaster.danger("An error has occured.");
                 } finally {
-                  setLoading(false);
                 }
               }
             }}
@@ -167,9 +162,7 @@ const BeatSaverBrowser = () => {
         totalPages={songStore.totalPages}
         onPageChange={(page) => {
           songStore.page = page - 1;
-          setLoading(true);
           songStore.fetchSongs();
-          setLoading(false);
         }}
       />
     </Pane>

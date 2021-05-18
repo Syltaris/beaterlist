@@ -43,7 +43,6 @@ class BeatSaverBrowserStore {
     } catch (err) {
       throw err;
     }
-    console.log(resp);
     this.totalPages = resp.lastPage;
     this.songsList = resp.docs;
     this.loading = false;
@@ -123,14 +122,11 @@ class BeatSaverSongCache {
   // would love to use Promise.all if no rate limit :(
   async retrieveMultipleSongData(hashes, rateLimitDelay = 100) {
     const missingHashes = hashes.filter((hash) => !(hash in this.songCache));
-    console.log("getting hashes", missingHashes);
     for (const hash of missingHashes) {
-      console.log("getting from beat-saver server ", hash);
       const resp = await getMapByHash(hash);
       await new Promise((res) => setTimeout(res, rateLimitDelay)); // sleep
       this.songCache[hash] = resp;
     }
-
     store.set("songCache", this.songCache);
   }
 
