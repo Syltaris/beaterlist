@@ -36,15 +36,25 @@ const getTableCellPropsForCol = (key) => {
   let props = {
     flexBasis: 120,
     flexGrow: 0,
+    flexShrink: 0,
   };
   if (key === "description") {
     props = {
-      flexBasis: 100,
+      flexBasis: 600,
+      flexGrow: 0,
+      flexShrink: 0,
     };
   } else if (key === "cover") {
-    return {
+    props = {
       flexBasis: 60,
       flexGrow: 0,
+      flexShrink: 0,
+    };
+  } else if (key === "hash") {
+    props = {
+      flexBasis: 300,
+      flexGrow: 0,
+      flexShrink: 0,
     };
   } else if (
     ["downloads", "plays", "upvotes", "downvotes", "rating", "key"].includes(
@@ -55,6 +65,7 @@ const getTableCellPropsForCol = (key) => {
     props = {
       flexBasis: 72,
       flexGrow: 0,
+      flexShrink: 0,
     };
   }
 
@@ -111,16 +122,21 @@ const DraggableRow = ({ idx, playlistId, song, onRemoveSongClick }) => {
           key={song.hash}
           isSelectable
           height={42}
-          maxWidth="100%"
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          <Table.Cell flexBasis={40} flexGrow={0}>
+          <Table.Cell flexBasis={40} flexGrow={0} flexShrink={0}>
             <DragHandleHorizontalIcon />
           </Table.Cell>
           {columnsToShow.map((key) => getTableCellForCol(key, song))}
-          <Table.Cell flexBasis={35} flexGrow={0}>
+          <Table.Cell
+            flexBasis={35}
+            flexGrow={0}
+            flexShrink={0}
+            marginRight={0}
+            marginLeft="auto"
+          >
             <DeleteIcon onClick={() => onRemoveSongClick(song)} />
           </Table.Cell>
         </Table.Row>
@@ -135,32 +151,26 @@ export const SongList = ({ playlist }) => {
 
   const [songToRemove, setSongToRemove] = useState(null);
   return (
-    <Table maxWidth="100%">
+    <Table minWidth="300px" overflowX="scroll">
       <Table.Head height={42}>
         <Table.HeaderCell flexBasis={40} flexGrow={0} />
         {columnsToShow.map((key) => (
-          <Table.HeaderCell key={key} {...getTableCellPropsForCol(key)}>
+          <Table.TextHeaderCell key={key} {...getTableCellPropsForCol(key)}>
             {getColHeaderText(key)}
-          </Table.HeaderCell>
+          </Table.TextHeaderCell>
         ))}
+        <Table.HeaderCell
+          flexBasis={35}
+          flexGrow={0}
+          flexShrink={0}
+          marginRight={0}
+          marginLeft="auto"
+        />
       </Table.Head>
-      <Table.Body display="flex">
-        <Dialog
-          isShown={!!songToRemove}
-          title={`Delete ${songToRemove?.name} from ${playlist.title}?`}
-          onCloseComplete={() => setSongToRemove(null)}
-          onConfirm={() => {
-            playlist.removeSong(songToRemove);
-            setSongToRemove(null);
-          }}
-          confirmLabel={"Confirm"}
-          intent="danger"
-        >
-          This action is irreverisble!
-        </Dialog>
+      <Table.Body overflow="visible">
         <Droppable key={playlist.id} droppableId={playlist.id}>
           {(provided, snapshot) => (
-            <div ref={provided.innerRef} style={{ flex: 1, minHeight: "40px" }}>
+            <div ref={provided.innerRef} style={{ minHeight: "40px" }}>
               {playlist.songs.map((song, idx) => (
                 <DraggableRow
                   idx={idx}
@@ -174,6 +184,19 @@ export const SongList = ({ playlist }) => {
           )}
         </Droppable>
       </Table.Body>
+      <Dialog
+        isShown={!!songToRemove}
+        title={`Delete ${songToRemove?.name} from ${playlist.title}?`}
+        onCloseComplete={() => setSongToRemove(null)}
+        onConfirm={() => {
+          playlist.removeSong(songToRemove);
+          setSongToRemove(null);
+        }}
+        confirmLabel={"Confirm"}
+        intent="danger"
+      >
+        This action is irreverisble!
+      </Dialog>
     </Table>
   );
 };

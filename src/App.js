@@ -48,10 +48,7 @@ const App = () => {
         </Pane>
 
         <DragDropContext onDragEnd={onDragEnd}>
-          <Pane>
-            <BeatSaverBrowser />
-          </Pane>
-
+          <BeatSaverBrowser />
           <PlaylistsContainer />
         </DragDropContext>
       </div>

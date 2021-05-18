@@ -20,25 +20,25 @@ const PlaylistsContainer = () => {
 };
 
 const PlaylistsViewer = observer(({ userPreferences, playlistStore }) => (
-  <Pane
-    width="100%"
-    height="80vh"
-    display="flex"
-    flexDirection={userPreferences.playlistHorizontalMode ? "row" : "column"}
-    //justifyContent="center"
-    border="default"
-    //overflowX="scroll"
+  <div
+    style={{
+      width: userPreferences.playlistHorizontalMode ? "100%" : "50%",
+      height: "80vh",
+      display: "flex",
+      flexDirection: userPreferences.playlistHorizontalMode ? "row" : "column",
+      //justifyContent:"center"
+      border: "default",
+      //overflowX:"scroll"
+    }}
   >
     {playlistStore.playlists.map((playlist, idx) => (
-      <Pane>
-        <PlaylistTable
-          key={`${playlist.title}|${idx}`}
-          playlistKey={`${playlist.title}|${idx}`}
-          playlist={playlist}
-        />
-      </Pane>
+      <PlaylistTable
+        key={`${playlist.title}|${idx}`}
+        playlistKey={`${playlist.title}|${idx}`}
+        playlist={playlist}
+      />
     ))}
-  </Pane>
+  </div>
 ));
 
 export default PlaylistsContainer;

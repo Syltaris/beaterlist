@@ -10,12 +10,7 @@ const PlaylistTable = ({ playlist }) => {
       style={{
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
-        border: "default",
         padding: 20,
-        background: "grey",
-        minWidth: "300px",
-        maxWidth: "800px",
       }}
     >
       <Header playlist={playlist} />
