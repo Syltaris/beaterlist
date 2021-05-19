@@ -22,12 +22,11 @@ import {
 } from "evergreen-ui";
 
 const exportPlaylist = (playlist) => {
-  const bplistJson = playlist.asBplistJson();
   var element = document.createElement("a");
   element.setAttribute(
     "href",
     "data:text/plain;charset=utf-8," +
-      encodeURIComponent(JSON.stringify(bplistJson))
+      encodeURIComponent(JSON.stringify(playlist.asBplistJson()))
   );
   element.setAttribute("download", `${playlist.title}.bplist`);
 

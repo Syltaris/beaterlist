@@ -8,13 +8,12 @@ import {
   ChevronRightIcon,
 } from "evergreen-ui";
 import { observer } from "mobx-react-lite";
+import { saveAs } from "file-saver";
+import JSZip from "jszip";
 
 import PlaylistImporter from "./PlaylistImporter";
-
 import { UserPreferencesContext } from "../stores/preferences";
-
 import { PlaylistStoreContext } from "../stores/playlists";
-
 import { camelCaseToWords } from "../utils/string";
 
 export const Sidebar = () => {
@@ -25,6 +24,7 @@ export const Sidebar = () => {
   const playlistStore = useContext(PlaylistStoreContext);
 
   const [loading, setLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
   return (
     <div
       style={{
@@ -85,6 +85,29 @@ export const Sidebar = () => {
             );
           }}
         />
+
+        <Button
+          isLoading={exporting}
+          onClick={async () => {
+            setExporting(true);
+            const zip = new JSZip();
+            playlistStore.playlists.forEach((playlist, idx) => {
+              zip.file(
+                `[${idx}]-${playlist.title}.bplist`,
+                JSON.stringify(playlist.asBplistJson())
+              );
+            });
+            const content = await zip.generateAsync({ type: "blob" });
+            saveAs(
+              content,
+              `beaterlist-${new Date().toLocaleDateString()}.zip`
+            );
+            setExporting(false);
+          }}
+          marginBottom="10px"
+        >
+          Export all playlists
+        </Button>
       </div>
       <Heading>Playlists Config</Heading>
       <Checkbox
