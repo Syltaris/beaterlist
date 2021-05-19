@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^12.1.10",
     "evergreen-ui": "^6.0.0",
     "gh-pages": "^3.1.0",
+    "jszip": "^3.6.0",
     "mobx": "^6.3.0",
     "mobx-react-lite": "^3.2.0",
     "react": "^17.0.2",

@@ -5,7 +5,6 @@ import { UserPreferencesContext } from "../../stores/preferences";
 import Header from "./components/Header";
 import SongList from "./components/SongList";
 
-// TODO: handle json types seperately
 const PlaylistTable = ({ playlist }) => {
   const userPreferences = useContext(UserPreferencesContext);
 

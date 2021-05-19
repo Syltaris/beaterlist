@@ -1,9 +1,10 @@
 import { beatSaverBrowserStore } from "../stores/beatSaver";
 import { playlistStore } from "../stores/playlists";
 
+import { DROPPABLE_ID as browserDroppableId } from "../components/BeatSaverBrowser/constants";
+
 export const onDragEnd = ({ destination, source }) => {
   // the only one that is required
-  console.log(destination, source);
   if (!destination || !source) {
     return;
   }
@@ -15,12 +16,18 @@ export const onDragEnd = ({ destination, source }) => {
   }
 
   // beat saver browser logic
-  if (source.droppableId === "BEAT_SAVER_BROWSER") {
+  if (source.droppableId === browserDroppableId) {
     const destinationPlaylist = playlistStore.playlists.find(
       (p) => p.id === destination.droppableId
     );
     const songToAdd = beatSaverBrowserStore.songsList[source.index];
-    console.log("hiyaya", songToAdd.hash);
+
+    if (
+      destinationPlaylist.songs.find((song) => song.hash === songToAdd.hash)
+    ) {
+      throw Error("Song already exists in this playlist.");
+    }
+
     destinationPlaylist.addSongBySongData(songToAdd, destIdx);
     playlistStore.saveAllPlaylists();
     return;
@@ -37,7 +44,6 @@ export const onDragEnd = ({ destination, source }) => {
   }
 
   // droppableId are playlist unique ids
-  // very kludgey, should use some id?
   const sourcePlaylist = playlistStore.playlists.find(
     (p) => p.id === source.droppableId
   );
@@ -46,7 +52,6 @@ export const onDragEnd = ({ destination, source }) => {
     const songToMove = sourcePlaylist.songs[sourceIdx];
     sourcePlaylist.removeSong(songToMove); // could be optimized, currently does extra search
     sourcePlaylist.insertSongAtIdx(songToMove, destIdx);
-    console.log("moving within", songToMove, sourceIdx, destIdx);
   } else {
     // move across list
     const destinationPlaylist = playlistStore.playlists.find(

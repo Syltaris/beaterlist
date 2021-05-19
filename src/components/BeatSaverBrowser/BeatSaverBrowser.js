@@ -28,6 +28,8 @@ import {
 } from "../../sharedUtils/playlistTable";
 import { Song } from "../../stores/songs";
 
+import { DROPPABLE_ID } from "./constants";
+
 const BeatSaverBrowser = () => {
   const songStore = useContext(BeatSaverBrowserStoreContext);
 
@@ -111,7 +113,7 @@ const BeatSaverBrowser = () => {
             </Table.TextHeaderCell>
           ))}
         </Table.Head>
-        <Droppable droppableId="BEAT_SAVER_BROWSER" isDropDisabled={true}>
+        <Droppable droppableId={DROPPABLE_ID} isDropDisabled={true}>
           {(provided, snapshot) => (
             <Table.Body
               overflow="visible"
