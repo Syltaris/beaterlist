@@ -91,15 +91,14 @@ export const Sidebar = () => {
               event_label: "importPlaylists",
               value: playlists.length,
             });
-            const promises = playlists.map((playlist) =>
-              playlistStore.addPlaylistFromBplistData(playlist.data)
-            );
             setLoading(true);
-            const out = await Promise.all(promises); // can check type here
+            for (const playlist of playlists) {
+              await playlistStore.addPlaylistFromBplistData(playlist.data);
+            }
             setLoading(false);
             toaster.success(
-              `Successfully imported ${out.length} playlist${
-                out.length === 1 ? "" : "s"
+              `Successfully imported ${playlists.length} playlist${
+                playlists.length === 1 ? "" : "s"
               }.`
             );
           }}
