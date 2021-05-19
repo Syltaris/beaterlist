@@ -120,7 +120,7 @@ class BeatSaverSongCache {
   }
 
   // would love to use Promise.all if no rate limit :(
-  async retrieveMultipleSongData(hashes, rateLimitDelay = 100) {
+  async retrieveMultipleSongData(hashes, rateLimitDelay = 200) {
     const missingHashes = hashes.filter((hash) => !(hash in this.songCache));
     for (const hash of missingHashes) {
       const resp = await getMapByHash(hash);
