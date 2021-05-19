@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import AudioPlayer from "../../../stores/audioPlayer";
 import JSZip from "jszip";
+import mixpanel from "mixpanel-browser";
 
 import { PlayIcon, IconButton, PauseIcon } from "evergreen-ui";
 
@@ -49,14 +50,26 @@ const getButtonIcon = (songData) => {
 
 const onClick = (songData) => {
   if (!(AudioPlayer.previewingSongHash === songData.hash)) {
+    mixpanel.track("pressPreviewSongButton", {
+      event_category: "beatSaverBrowser",
+      event_label: "pressPreviewSongButton",
+    });
     previewSong(songData);
     return;
   }
 
   if (AudioPlayer.paused) {
     AudioPlayer.play();
+    mixpanel.track("pressPlaySong", {
+      event_category: "beatSaverBrowser",
+      event_label: "pressPlaySong",
+    });
     return;
   }
+  mixpanel.track("pressPauseSong", {
+    event_category: "beatSaverBrowser",
+    event_label: "pressPauseSong",
+  });
   AudioPlayer.pause();
 };
 

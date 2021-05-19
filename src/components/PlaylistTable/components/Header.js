@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { observer } from "mobx-react-lite";
-
+import mixpanel from "mixpanel-browser";
 import {
   Avatar,
   Heading,
@@ -75,14 +75,14 @@ export const Header = ({ playlist }) => {
       setShowAddSongLoader(true);
       const addedSongData = await playlist.addSongByKey(songKeyInput);
       toaster.success(`${addedSongData.name} added to ${playlist.title}.`);
-      window.gtag("event", "addNewSongByKeySuccess", {
+      mixpanel.track("addNewSongByKeySuccess", {
         event_category: "playlist",
         event_label: "addNewSongByKeySuccess",
       });
     } catch (err) {
       setAddSongError(true);
       toaster.danger(err.message);
-      window.gtag("event", "addNewSongByKeyFail", {
+      mixpanel.track("addNewSongByKeyFail", {
         event_category: "playlist",
         event_label: "addNewSongByKeyFail",
       });
@@ -103,7 +103,7 @@ export const Header = ({ playlist }) => {
         name={playlist.title}
         size={50}
         onClick={() => {
-          window.gtag("event", "playlistImageChange", {
+          mixpanel.track("playlistImageChange", {
             event_category: "playlist",
             event_label: "playlistImageChange",
           });
@@ -140,7 +140,7 @@ export const Header = ({ playlist }) => {
                 icon={TickIcon}
                 intent="success"
                 onClick={() => {
-                  window.gtag("event", "playlistTitleAuthorUpdate", {
+                  mixpanel.track("playlistTitleAuthorUpdate", {
                     event_category: "playlist",
                     event_label: "playlistTitleAuthorUpdate",
                   });
@@ -175,7 +175,7 @@ export const Header = ({ playlist }) => {
           <IconButton
             icon={EditIcon}
             onClick={() => {
-              window.gtag("event", "playlistEditToggle", {
+              mixpanel.track("playlistEditToggle", {
                 event_category: "playlist",
                 event_label: "playlistEditToggle",
                 value: !editTextData,
@@ -190,7 +190,7 @@ export const Header = ({ playlist }) => {
             icon={FloppyDiskIcon}
             marginLeft="2px"
             onClick={() => {
-              window.gtag("event", "savePlaylst", {
+              mixpanel.track("savePlaylst", {
                 event_category: "playlist",
                 event_label: "savePlaylst",
               });
@@ -203,7 +203,7 @@ export const Header = ({ playlist }) => {
             icon={DeleteIcon}
             marginLeft="2px"
             onClick={() => {
-              window.gtag("event", "deletePlaylist", {
+              mixpanel.track("deletePlaylist", {
                 event_category: "playlist",
                 event_label: "deletePlaylist",
               });
@@ -216,7 +216,7 @@ export const Header = ({ playlist }) => {
             icon={AddIcon}
             marginLeft="2px"
             onClick={() => {
-              window.gtag("event", "addSongByKey", {
+              mixpanel.track("addSongByKey", {
                 event_category: "playlist",
                 event_label: "addSongByKey",
               });
@@ -231,7 +231,7 @@ export const Header = ({ playlist }) => {
         title={`Delete ${playlist.title}?`}
         onCloseComplete={() => setShowDeleteConfirmation(false)}
         onConfirm={() => {
-          window.gtag("event", "deletePlaylistConfirmation", {
+          mixpanel.track("deletePlaylistConfirmation", {
             event_category: "playlist",
             event_label: "deletePlaylistConfirmation",
           });

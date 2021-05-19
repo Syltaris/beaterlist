@@ -1,5 +1,6 @@
 import { beatSaverBrowserStore } from "../stores/beatSaver";
 import { playlistStore } from "../stores/playlists";
+import mixpanel from "mixpanel-browser";
 
 import { DROPPABLE_ID as browserDroppableId } from "../components/BeatSaverBrowser/constants";
 import { DROPPABLE_ID as playlistsDroppableId } from "../components/PlaylistsContainer";
@@ -28,7 +29,10 @@ export const onDragEnd = ({ destination, source }) => {
     ) {
       throw Error("Song already exists in this playlist.");
     }
-
+    mixpanel.track("addSongFromBrowserToPlaylist", {
+      event_category: "beatSaverBrowser",
+      event_label: "addSongFromBrowserToPlaylist",
+    });
     destinationPlaylist.addSongBySongData(songToAdd, destIdx);
     playlistStore.savePlaylist(destinationPlaylist);
     return;
@@ -41,6 +45,10 @@ export const onDragEnd = ({ destination, source }) => {
   ) {
     const playlistToMove = playlistStore.playlists[source.index];
     playlistStore.movePlaylist(playlistToMove, destination.index);
+    mixpanel.track("reorderingPlaylists", {
+      event_category: "playlist",
+      event_label: "reorderingPlaylists",
+    });
     return;
   }
 
@@ -55,6 +63,10 @@ export const onDragEnd = ({ destination, source }) => {
     sourcePlaylist.insertSongAtIdx(songToMove, destIdx);
 
     playlistStore.savePlaylist(sourcePlaylist);
+    mixpanel.track("reorderingSongsWithinPlaylist", {
+      event_category: "playlist",
+      event_label: "reorderingSongsWithinPlaylist",
+    });
   } else {
     // move across list
     const destinationPlaylist = playlistStore.playlists.find(
@@ -73,5 +85,9 @@ export const onDragEnd = ({ destination, source }) => {
 
     playlistStore.savePlaylist(sourcePlaylist);
     playlistStore.savePlaylist(destinationPlaylist);
+    mixpanel.track("reorderingSongsAcrossPlaylist", {
+      event_category: "playlist",
+      event_label: "reorderingSongsAcrossPlaylist",
+    });
   }
 };

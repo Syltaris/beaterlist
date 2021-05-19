@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import mixpanel from "mixpanel-browser";
 import {
   Heading,
   Checkbox,
@@ -45,7 +46,7 @@ export const Sidebar = () => {
       >
         <Button
           onClick={() => {
-            window.gtag("event", "showBeatSaverBrowser", {
+            mixpanel.track("showBeatSaverBrowser", {
               event_category: "sidebarConfig",
               event_label: "showBeatSaverBrowser",
               value: !preferences.showBeatSaverBrowser,
@@ -69,7 +70,7 @@ export const Sidebar = () => {
         </Button>
         <Button
           onClick={() => {
-            window.gtag("event", "createNewPlaylist", {
+            mixpanel.track("createNewPlaylist", {
               event_category: "sidebarConfig",
               event_label: "createNewPlaylist",
             });
@@ -84,7 +85,7 @@ export const Sidebar = () => {
           isLoading={loading}
           marginBottom="10px"
           onImportClick={async (playlists) => {
-            window.gtag("event", "importPlaylists", {
+            mixpanel.track("importPlaylists", {
               event_category: "sidebarConfig",
               event_label: "importPlaylists",
               value: playlists.length,
@@ -105,7 +106,7 @@ export const Sidebar = () => {
         <Button
           isLoading={exporting}
           onClick={async () => {
-            window.gtag("event", "exportPlaylists", {
+            mixpanel.track("exportPlaylists", {
               event_category: "sidebarConfig",
               event_label: "exportPlaylists",
             });
@@ -135,7 +136,7 @@ export const Sidebar = () => {
           label="Horizontal Mode"
           checked={horizontalMode}
           onChange={(e) => {
-            window.gtag("event", "toggleHorizontalMode", {
+            mixpanel.track("toggleHorizontalMode", {
               event_category: "sidebarConfig",
               event_label: "toggleHorizontalMode",
               value: e.target.checked,
@@ -151,7 +152,7 @@ export const Sidebar = () => {
             label={camelCaseToWords(key)}
             checked={columnsToShow[key]}
             onChange={(e) => {
-              window.gtag("event", "columnsToShow", {
+              mixpanel.track("columnsToShow", {
                 event_category: "sidebarConfig",
                 event_label: "columnsToShow",
                 value: JSON.stringify(columnsToShow),

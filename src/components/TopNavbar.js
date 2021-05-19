@@ -7,6 +7,7 @@ import {
   Heading,
   Paragraph,
 } from "evergreen-ui";
+import mixpanel from "mixpanel-browser";
 import { observer } from "mobx-react-lite"; // may not need it
 
 export const Navbar = () => {
@@ -30,7 +31,7 @@ export const Navbar = () => {
         <HelpIcon
           color="white"
           onClick={() => {
-            window.gtag("event", "toggleHelp", {
+            mixpanel.track("toggleHelp", {
               event_category: "sidebarConfig",
               event_label: "toggleHelp",
               value: !openHelp,
@@ -53,7 +54,7 @@ export const Navbar = () => {
       <SideSheet
         isShown={openHelp}
         onCloseComplete={() => {
-          window.gtag("event", "closeHelp", {
+          mixpanel.track("closeHelp", {
             event_category: "sidebarConfig",
             event_label: "closeHelp",
           });

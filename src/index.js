@@ -13,6 +13,8 @@ import {
   BeatSaverBrowserStoreContext,
   beatSaverBrowserStore,
 } from "./stores/beatSaver";
+import mixpanel from "mixpanel-browser";
+mixpanel.init("00d006716755a1937b5d466c60b20f57");
 
 ReactDOM.render(
   <React.StrictMode>
