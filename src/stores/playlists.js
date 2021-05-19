@@ -35,7 +35,7 @@ export class Playlist {
   }
   set image(image) {
     this._image = image;
-    this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
+    this.store.savePlaylist(this);
   }
 
   get title() {
@@ -43,7 +43,7 @@ export class Playlist {
   }
   set title(title) {
     this._title = title;
-    this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
+    this.store.savePlaylist(this);
   }
 
   get author() {
@@ -51,7 +51,7 @@ export class Playlist {
   }
   set author(author) {
     this._author = author;
-    this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
+    this.store.savePlaylist(this);
   }
 
   get songs() {
@@ -59,7 +59,7 @@ export class Playlist {
   }
   set songs(songs) {
     this._songs = songs;
-    this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
+    this.store.savePlaylist(this);
   }
 
   delete() {
@@ -69,10 +69,12 @@ export class Playlist {
   removeSong(song) {
     const idx = this._songs.indexOf(song);
     this._songs.splice(idx, 1);
+    this.store.savePlaylist(this);
   }
 
   insertSongAtIdx(song, idx) {
     this._songs.splice(idx, 0, song);
+    this.store.savePlaylist(this);
   }
 
   async addSongByKey(songKey) {
@@ -97,7 +99,7 @@ export class Playlist {
 
     beatSaverSongCache.manualAddSongData(songData);
     this.songs.push(new Song({ hash: songData.hash }));
-    this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
+    this.store.savePlaylist(this);
 
     return songData;
   }
@@ -113,7 +115,7 @@ export class Playlist {
       }
       beatSaverSongCache.manualAddSongData(songData);
       this._songs.splice(idx, 0, new Song({ hash })); // let Song handle fetching
-      this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
+      this.store.savePlaylist(this);
     } catch (err) {
       throw err;
     }
@@ -140,30 +142,39 @@ export class Playlist {
 }
 
 class PlaylistStore {
-  _playlists = [];
+  _playlists = []; // loaded Playlist instances
 
   constructor() {
     makeAutoObservable(this);
 
-    const savedPlaylists = store.get("playlists");
-    if (savedPlaylists) {
-      const playlists = [];
-      for (const playlist of savedPlaylists) {
-        playlists.push(new Playlist(playlist, this)); // converts json to Playlist objects
-      }
-      this._playlists = playlists;
+    const playlistIds = store.get("playlistIdsLUT");
+
+    if (playlistIds && playlistIds.length > 0) {
+      this.playlists = playlistIds.map((id) => {
+        const playlistJson = store.get(id);
+        return new Playlist(playlistJson, this);
+      });
     }
   }
 
   get playlists() {
     return this._playlists;
   }
+  set playlists(playlists) {
+    this._playlists = playlists;
+  }
+  get playlistIds() {
+    return this._playlistIds;
+  }
+  set playlistIds(playlistIds) {
+    this._playlistIds = playlistIds;
+  }
 
   getNewId() {
-    const allIds = [this._playlists.map((p) => p.id)];
+    const playlistIds = this.playlists.map((p) => p.id);
     let newId = uuidv4();
 
-    while (allIds.includes(newId)) {
+    while (playlistIds.includes(newId)) {
       newId = uuidv4();
     }
 
@@ -181,24 +192,40 @@ class PlaylistStore {
       },
       this
     );
-    this.appendPlaylist(playlist);
+    this.appendPlaylistToTop(playlist);
   }
 
-  appendPlaylist(playlist) {
-    this._playlists.push(playlist);
-    this.saveAllPlaylists();
+  appendPlaylistToTop(playlist) {
+    this.playlists.splice(0, 0, playlist);
+    this.savePlaylist(playlist);
+    this.savePlaylistLUT();
   }
 
   deletePlaylist(playlist) {
     const idx = this._playlists.indexOf(playlist);
     this._playlists.splice(idx, 1);
-    this.saveAllPlaylists();
+
+    store.remove(playlist.id);
+    this.savePlaylistLUT();
   }
 
   movePlaylist(playlist, idx) {
-    this._playlists.splice(this._playlists.indexOf(playlist), 1);
-    this._playlists.splice(idx, 0, playlist);
-    this.saveAllPlaylists();
+    this.playlists.splice(this.playlists.indexOf(playlist), 1);
+    this.playlists.splice(idx, 0, playlist);
+
+    this.savePlaylistLUT();
+  }
+
+  savePlaylistLUT() {
+    store.set(
+      "playlistIdsLUT",
+      this.playlists.map((p) => p.id)
+    );
+  }
+
+  savePlaylist(playlist) {
+    const playlistJson = playlist.asJson();
+    store.set(playlist.id, playlistJson);
   }
 
   saveAllPlaylists() {
@@ -208,7 +235,7 @@ class PlaylistStore {
 
   addPlaylistFromBplistData = async (data) => {
     // do preloading here for multiple songs
-    await beatSaverSongCache.retrieveMultipleSongData(
+    const loadedSongHashes = await beatSaverSongCache.retrieveMultipleSongData(
       data.songs.map((song) => song.hash)
     );
     const playlist = new Playlist(
@@ -217,11 +244,11 @@ class PlaylistStore {
         image: data.image,
         title: data.playlistTitle,
         author: data.playlistAuthor,
-        songs: data.songs,
+        songs: data.songs.filter((s) => loadedSongHashes.includes(s.hash)),
       },
       this
     );
-    this.appendPlaylist(playlist);
+    this.appendPlaylistToTop(playlist);
   };
 }
 

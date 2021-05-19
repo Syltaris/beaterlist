@@ -16,6 +16,7 @@ const PlaylistTable = ({ playlist }) => {
         flexDirection: "column",
         padding: 10,
         margin: 10,
+        minWidth: "400px",
         maxWidth: userPreferences.playlistHorizontalMode ? "800px" : "100%",
         borderRadius: 15,
         backgroundColor: "white",

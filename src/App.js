@@ -7,8 +7,11 @@ import PlaylistsContainer from "./components/PlaylistsContainer";
 import BeatSaverBrowser from "./components/BeatSaverBrowser/";
 import { UserPreferencesContext } from "./stores/preferences";
 import Sidebar from "./components/Sidebar";
+import TopNavbar from "./components/TopNavbar";
 
 import { onDragEnd } from "./controllers/dragAndDrop";
+
+import background from "./assets/background/tile.png";
 
 const App = () => {
   const preferences = useContext(UserPreferencesContext);
@@ -21,7 +24,9 @@ const App = () => {
         flexDirection: "column",
         alignItems: "center",
         border: "default",
-        backgroundColor: "#f9f9f9",
+        background: `url(${background})`,
+        backgroundRepeat: "repeat",
+        backgroundSize: "200px 200px",
       }}
     >
       <div
@@ -32,6 +37,7 @@ const App = () => {
         }}
       >
         <div style={{ minWidth: 250 }}>
+          <TopNavbar />
           <Sidebar />
         </div>
 

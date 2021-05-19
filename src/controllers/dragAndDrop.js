@@ -30,7 +30,7 @@ export const onDragEnd = ({ destination, source }) => {
     }
 
     destinationPlaylist.addSongBySongData(songToAdd, destIdx);
-    playlistStore.saveAllPlaylists();
+    playlistStore.savePlaylist(destinationPlaylist);
     return;
   }
 
@@ -41,7 +41,6 @@ export const onDragEnd = ({ destination, source }) => {
   ) {
     const playlistToMove = playlistStore.playlists[source.index];
     playlistStore.movePlaylist(playlistToMove, destination.index);
-    playlistStore.saveAllPlaylists();
     return;
   }
 
@@ -54,6 +53,8 @@ export const onDragEnd = ({ destination, source }) => {
     const songToMove = sourcePlaylist.songs[sourceIdx];
     sourcePlaylist.removeSong(songToMove); // could be optimized, currently does extra search
     sourcePlaylist.insertSongAtIdx(songToMove, destIdx);
+
+    playlistStore.savePlaylist(sourcePlaylist);
   } else {
     // move across list
     const destinationPlaylist = playlistStore.playlists.find(
@@ -69,6 +70,8 @@ export const onDragEnd = ({ destination, source }) => {
 
     sourcePlaylist.removeSong(songToMove);
     destinationPlaylist.insertSongAtIdx(songToMove, destIdx);
+
+    playlistStore.savePlaylist(sourcePlaylist);
+    playlistStore.savePlaylist(destinationPlaylist);
   }
-  playlistStore.saveAllPlaylists();
 };

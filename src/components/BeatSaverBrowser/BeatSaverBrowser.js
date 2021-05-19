@@ -44,6 +44,7 @@ const BeatSaverBrowser = () => {
       paddingLeft="20px"
       paddingRight="20px"
       backgroundColor="white"
+      overflowY="scroll"
     >
       <div style={{ display: "flex", flexDirection: "row" }}>
         <Heading marginTop="10px" marginBottom="10px">
@@ -53,8 +54,8 @@ const BeatSaverBrowser = () => {
       </div>
       <Text>
         Drag songs from here to your playlists to add songs directly. Currently,
-        you can only either filter by category, or do a search, but not in
-        conjunction with each other.
+        you can only either filter by category, or do a search, but not with
+        each other.
       </Text>
       <div
         style={{
