@@ -2,17 +2,37 @@ import { createContext } from "react";
 import store from "store";
 import { makeAutoObservable } from "mobx";
 
-const bplistSongKeys = ["name", "description", "difficulties"];
+const bplistSongKeys = [
+  "cover",
+  "name",
+  "songAuthor",
+  "levelAuthor",
+  "duration",
+  "difficulties",
+  "downloads",
+  "plays",
+  "upvotes",
+  "downvotes",
+  "rating",
+  "uploadDate",
+  "key",
+  "hash",
+  "description",
+];
 
 const initColumnsToShow = () => {
   const output = {};
   bplistSongKeys.forEach((key) => (output[key] = false));
+  output["cover"] = true;
+  output["name"] = true;
+
   return output;
 };
 
-export class UserPreferencesStore {
+class UserPreferencesStore {
   _playlistsHorizontalMode = false;
   _playlistColumnsToShow = undefined;
+  _showBeatSaverBrowser = false;
 
   constructor() {
     makeAutoObservable(this);
@@ -20,6 +40,7 @@ export class UserPreferencesStore {
       store.get("playlistHorizontalMode") || false;
     this._playlistColumnsToShow =
       store.get("playlistColumnsToShow") || initColumnsToShow();
+    this._showBeatSaverBrowser = store.get("showBeatSaverBrowser") || false;
   }
 
   get playlistHorizontalMode() {
@@ -27,7 +48,7 @@ export class UserPreferencesStore {
   }
   set playlistHorizontalMode(flag) {
     this._playlistsHorizontalMode = flag;
-    store.set("playlistHorizontalMode", flag);
+    store.set("playlistHorizontalMode", this._playlistsHorizontalMode);
   }
 
   get playlistColumnsToShow() {
@@ -36,6 +57,17 @@ export class UserPreferencesStore {
   set playlistColumnsToShow(columns) {
     this._playlistColumnsToShow = columns;
     store.set("playlistColumnsToShow", this._playlistColumnsToShow); // probably can autorun the save function
+  }
+
+  get showBeatSaverBrowser() {
+    return this._showBeatSaverBrowser;
+  }
+  set showBeatSaverBrowser(flag) {
+    this._showBeatSaverBrowser = flag;
+    this._showBeatSaverBrowser = store.set(
+      "showBeatSaverBrowser",
+      this._showBeatSaverBrowser
+    );
   }
 
   setPlaylistColumnToShow(key, flag) {
@@ -53,4 +85,5 @@ export class UserPreferencesStore {
   }
 }
 
-export const UserPreferencesContext = createContext();
+export const userPreferencesStore = new UserPreferencesStore();
+export const UserPreferencesContext = createContext(userPreferencesStore);
