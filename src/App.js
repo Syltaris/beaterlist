@@ -10,6 +10,8 @@ import Sidebar from "./components/Sidebar";
 
 import { onDragEnd } from "./controllers/dragAndDrop";
 
+import background from "./assets/background/tile.png";
+
 const App = () => {
   const preferences = useContext(UserPreferencesContext);
   return (
@@ -21,7 +23,9 @@ const App = () => {
         flexDirection: "column",
         alignItems: "center",
         border: "default",
-        backgroundColor: "#f9f9f9",
+        background: `url(${background})`,
+        backgroundRepeat: "repeat",
+        backgroundSize: "200px 200px",
       }}
     >
       <div
