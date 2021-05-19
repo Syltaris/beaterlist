@@ -10,26 +10,6 @@ import Sidebar from "./components/Sidebar";
 
 import { onDragEnd } from "./controllers/dragAndDrop";
 
-// TodO:
-// persist config
-// delete playlist?
-// create playlists
-// add songs by hash?
-// playlist import to persist playlist
-// list to list exchanges
-// image for new playlist
-// placeholder for empty playlist
-// playlist title edit collision check
-// (import will need to do replacement checks)
-// load in playlist browser (beat saver), to drag playlists in
-// more columns, beautified difficulties
-// drag and drop cleanup
-// export all?
-// reorder playlists
-// sidebar should be 'fixed' (with browser)
-
-// play preview?
-
 const App = () => {
   const preferences = useContext(UserPreferencesContext);
   return (
