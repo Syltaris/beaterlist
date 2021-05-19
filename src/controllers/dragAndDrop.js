@@ -2,6 +2,7 @@ import { beatSaverBrowserStore } from "../stores/beatSaver";
 import { playlistStore } from "../stores/playlists";
 
 import { DROPPABLE_ID as browserDroppableId } from "../components/BeatSaverBrowser/constants";
+import { DROPPABLE_ID as playlistsDroppableId } from "../components/PlaylistsContainer";
 
 export const onDragEnd = ({ destination, source }) => {
   // the only one that is required
@@ -35,11 +36,12 @@ export const onDragEnd = ({ destination, source }) => {
 
   // playlists reordering logic
   if (
-    source.droppableId === "playlists" &&
-    destination.droppableId === "playlists"
+    source.droppableId === playlistsDroppableId &&
+    destination.droppableId === playlistsDroppableId
   ) {
     const playlistToMove = playlistStore.playlists[source.index];
     playlistStore.movePlaylist(playlistToMove, destination.index);
+    playlistStore.saveAllPlaylists();
     return;
   }
 

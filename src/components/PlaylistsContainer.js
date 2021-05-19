@@ -1,11 +1,13 @@
 import { useContext } from "react";
-
-import { observer } from "mobx-react-lite";
+import { observer, Observer } from "mobx-react-lite";
+import { Droppable, Draggable } from "react-beautiful-dnd";
 
 import PlaylistTable from "./PlaylistTable/";
 
 import { UserPreferencesContext } from "../stores/preferences";
 import { PlaylistStoreContext } from "../stores/playlists";
+
+export const DROPPABLE_ID = "PLAYLIST";
 
 const PlaylistsContainer = () => {
   const userPreferences = useContext(UserPreferencesContext);
@@ -18,24 +20,57 @@ const PlaylistsContainer = () => {
   );
 };
 
-const PlaylistsViewer = observer(({ userPreferences, playlistStore }) => (
-  <div
-    style={{
-      width: userPreferences.playlistHorizontalMode ? "100%" : "50%",
-      height: "80vh",
-      display: "flex",
-      flexDirection: userPreferences.playlistHorizontalMode ? "row" : "column",
-      border: "default",
-    }}
-  >
-    {playlistStore.playlists.map((playlist, idx) => (
-      <PlaylistTable
-        key={`${playlist.title}|${idx}`}
-        playlistKey={`${playlist.title}|${idx}`}
-        playlist={playlist}
-      />
-    ))}
-  </div>
-));
+const PlaylistsViewer = observer(({ userPreferences, playlistStore }) => {
+  const horizontalMode = userPreferences.playlistHorizontalMode;
+  return (
+    <Droppable
+      droppableId={DROPPABLE_ID}
+      type={DROPPABLE_ID}
+      direction={horizontalMode ? "horizontal" : "vertical"}
+    >
+      {(provided) => (
+        <>
+          <div
+            ref={provided.innerRef}
+            style={{
+              width: horizontalMode ? "100%" : "50%",
+              height: "80vh",
+              display: "flex",
+              flexDirection: horizontalMode ? "row" : "column",
+              border: "default",
+            }}
+          >
+            <Observer>
+              {() =>
+                playlistStore.playlists.map((playlist, idx) => (
+                  <Draggable
+                    key={playlist.id}
+                    draggableId={playlist.id}
+                    index={idx}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                      >
+                        <PlaylistTable
+                          key={`${playlist.title}|${idx}`}
+                          playlistKey={`${playlist.title}|${idx}`}
+                          playlist={playlist}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                ))
+              }
+            </Observer>
+          </div>
+          {provided.placeholder}
+        </>
+      )}
+    </Droppable>
+  );
+});
 
 export default PlaylistsContainer;
