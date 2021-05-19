@@ -4,7 +4,6 @@ import { observer, Observer } from "mobx-react-lite";
 import {
   Table,
   Text,
-  DragHandleHorizontalIcon,
   Pane,
   Heading,
   Pagination,
@@ -27,6 +26,8 @@ import {
   getColHeaderText,
 } from "../../sharedUtils/playlistTable";
 import { Song } from "../../stores/songs";
+
+import PreviewSongButton from "./components/PreviewSongButton";
 
 import { DROPPABLE_ID } from "./constants";
 
@@ -143,7 +144,7 @@ const BeatSaverBrowser = () => {
                             flexGrow={0}
                             flexShrink={0}
                           >
-                            <DragHandleHorizontalIcon />
+                            <PreviewSongButton songData={songData} />
                           </Table.Cell>
                           {columnsToShow.map((key) =>
                             getTableCellForCol(

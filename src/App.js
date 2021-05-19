@@ -26,9 +26,9 @@ import { onDragEnd } from "./controllers/dragAndDrop";
 // drag and drop cleanup
 // export all?
 // reorder playlists
+// sidebar should be 'fixed' (with browser)
 
 // play preview?
-// sidebar should be 'fixed' (with browser)
 
 const App = () => {
   const preferences = useContext(UserPreferencesContext);
