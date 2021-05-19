@@ -80,6 +80,10 @@ export const Header = ({ playlist }) => {
         name={playlist.title}
         size={50}
         onClick={() => {
+          window.gtag("event", "playlistImageChange", {
+            event_category: "playlist",
+            event_label: "playlistImageChange",
+          });
           // get image upload and replace image in base64
           openFileDialog((event) => {
             let baseURL = "";
@@ -113,6 +117,10 @@ export const Header = ({ playlist }) => {
                 icon={TickIcon}
                 intent="success"
                 onClick={() => {
+                  window.gtag("event", "playlistTitleAuthorUpdate", {
+                    event_category: "playlist",
+                    event_label: "playlistTitleAuthorUpdate",
+                  });
                   playlist.title = titleInput;
                   playlist.author = authorInput;
                   setEditTextData(false);
@@ -143,7 +151,14 @@ export const Header = ({ playlist }) => {
         <Tooltip content="Edit Title & Author">
           <IconButton
             icon={EditIcon}
-            onClick={() => setEditTextData(!editTextData)}
+            onClick={() => {
+              window.gtag("event", "playlistEditToggle", {
+                event_category: "playlist",
+                event_label: "playlistEditToggle",
+                value: !editTextData,
+              });
+              setEditTextData(!editTextData);
+            }}
             marginLeft="2px"
           />
         </Tooltip>
@@ -151,21 +166,39 @@ export const Header = ({ playlist }) => {
           <IconButton
             icon={FloppyDiskIcon}
             marginLeft="2px"
-            onClick={() => exportPlaylist(playlist)}
+            onClick={() => {
+              window.gtag("event", "savePlaylst", {
+                event_category: "playlist",
+                event_label: "savePlaylst",
+              });
+              exportPlaylist(playlist);
+            }}
           />
         </Tooltip>
         <Tooltip content="Delete">
           <IconButton
             icon={DeleteIcon}
             marginLeft="2px"
-            onClick={() => setShowDeleteConfirmation(true)}
+            onClick={() => {
+              window.gtag("event", "deletePlaylist", {
+                event_category: "playlist",
+                event_label: "deletePlaylist",
+              });
+              setShowDeleteConfirmation(true);
+            }}
           />
         </Tooltip>
         <Tooltip content="Add new song">
           <IconButton
             icon={AddIcon}
             marginLeft="2px"
-            onClick={() => setShowAddDialog(true)}
+            onClick={() => {
+              window.gtag("event", "addSongByKey", {
+                event_category: "playlist",
+                event_label: "addSongByKey",
+              });
+              setShowAddDialog(true);
+            }}
           />
         </Tooltip>
       </div>
@@ -175,6 +208,10 @@ export const Header = ({ playlist }) => {
         title={`Delete ${playlist.title}?`}
         onCloseComplete={() => setShowDeleteConfirmation(false)}
         onConfirm={() => {
+          window.gtag("event", "deletePlaylistConfirmation", {
+            event_category: "playlist",
+            event_label: "deletePlaylistConfirmation",
+          });
           playlist.delete();
           toaster.success(`${playlist.title} deleted successfully.`);
           setShowDeleteConfirmation(false);
@@ -198,9 +235,17 @@ export const Header = ({ playlist }) => {
             toaster.success(
               `${addedSongData.name} added to ${playlist.title}.`
             );
+            window.gtag("event", "addNewSongByKeySuccess", {
+              event_category: "playlist",
+              event_label: "addNewSongByKeySuccess",
+            });
           } catch (err) {
             setAddSongError(true);
             toaster.danger(err.message);
+            window.gtag("event", "addNewSongByKeyFail", {
+              event_category: "playlist",
+              event_label: "addNewSongByKeyFail",
+            });
           } finally {
             setShowAddSongLoader(false);
           }

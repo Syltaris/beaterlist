@@ -27,7 +27,17 @@ export const Navbar = () => {
     >
       <Heading color="white" size={900}>
         BeaterList{" "}
-        <HelpIcon color="white" onClick={() => setOpenHelp(!openHelp)} />
+        <HelpIcon
+          color="white"
+          onClick={() => {
+            window.gtag("event", "toggleHelp", {
+              event_category: "sidebarConfig",
+              event_label: "toggleHelp",
+              value: !openHelp,
+            });
+            setOpenHelp(!openHelp);
+          }}
+        />
       </Heading>
       <Text color="white">
         by{" "}
@@ -40,7 +50,16 @@ export const Navbar = () => {
           zexurge
         </a>
       </Text>
-      <SideSheet isShown={openHelp} onCloseComplete={() => setOpenHelp(false)}>
+      <SideSheet
+        isShown={openHelp}
+        onCloseComplete={() => {
+          window.gtag("event", "closeHelp", {
+            event_category: "sidebarConfig",
+            event_label: "closeHelp",
+          });
+          setOpenHelp(false);
+        }}
+      >
         <Pane margin={40}>
           <Heading>Things to know</Heading>
           <Paragraph marginTop={10}>

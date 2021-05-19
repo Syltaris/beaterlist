@@ -47,6 +47,11 @@ export const Sidebar = () => {
       >
         <Button
           onClick={() => {
+            window.gtag("event", "showBeatSaverBrowser", {
+              event_category: "sidebarConfig",
+              event_label: "showBeatSaverBrowser",
+              value: !preferences.showBeatSaverBrowser,
+            });
             preferences.showBeatSaverBrowser =
               !preferences.showBeatSaverBrowser;
           }}
@@ -66,6 +71,10 @@ export const Sidebar = () => {
         </Button>
         <Button
           onClick={() => {
+            window.gtag("event", "createNewPlaylist", {
+              event_category: "sidebarConfig",
+              event_label: "createNewPlaylist",
+            });
             playlistStore.createNewPlaylist();
             toaster.success("New Playlist created.");
           }}
@@ -77,6 +86,11 @@ export const Sidebar = () => {
           isLoading={loading}
           marginBottom="10px"
           onImportClick={async (playlists) => {
+            window.gtag("event", "importPlaylists", {
+              event_category: "sidebarConfig",
+              event_label: "importPlaylists",
+              value: playlists.length,
+            });
             const promises = playlists.map((playlist) =>
               playlistStore.addPlaylistFromBplistData(playlist.data)
             );
@@ -94,6 +108,10 @@ export const Sidebar = () => {
         <Button
           isLoading={exporting}
           onClick={async () => {
+            window.gtag("event", "exportPlaylists", {
+              event_category: "sidebarConfig",
+              event_label: "exportPlaylists",
+            });
             setExporting(true);
             const zip = new JSZip();
             playlistStore.playlists.forEach((playlist, idx) => {
@@ -120,6 +138,11 @@ export const Sidebar = () => {
           label="Horizontal Mode"
           checked={horizontalMode}
           onChange={(e) => {
+            window.gtag("event", "toggleHorizontalMode", {
+              event_category: "sidebarConfig",
+              event_label: "toggleHorizontalMode",
+              value: e.target.checked,
+            });
             preferences.playlistHorizontalMode = e.target.checked;
           }}
         />
@@ -130,9 +153,14 @@ export const Sidebar = () => {
             key={key}
             label={camelCaseToWords(key)}
             checked={columnsToShow[key]}
-            onChange={(e) =>
-              preferences.setPlaylistColumnToShow(key, e.target.checked)
-            }
+            onChange={(e) => {
+              window.gtag("event", "columnsToShow", {
+                event_category: "sidebarConfig",
+                event_label: "columnsToShow",
+                value: JSON.stringify(columnsToShow),
+              });
+              preferences.setPlaylistColumnToShow(key, e.target.checked);
+            }}
           />
         ))}
       </div>
