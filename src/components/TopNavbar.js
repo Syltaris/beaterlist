@@ -14,7 +14,7 @@ export const Navbar = () => {
   return (
     <Pane
       width="100%"
-      height="250px"
+      height="100px"
       display="flex"
       flexDirection="column"
       justifyContent="center"

@@ -44,6 +44,7 @@ const BeatSaverBrowser = () => {
       paddingLeft="20px"
       paddingRight="20px"
       backgroundColor="white"
+      overflowY="scroll"
     >
       <div style={{ display: "flex", flexDirection: "row" }}>
         <Heading marginTop="10px" marginBottom="10px">

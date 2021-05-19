@@ -7,6 +7,7 @@ import PlaylistsContainer from "./components/PlaylistsContainer";
 import BeatSaverBrowser from "./components/BeatSaverBrowser/";
 import { UserPreferencesContext } from "./stores/preferences";
 import Sidebar from "./components/Sidebar";
+import TopNavbar from "./components/TopNavbar";
 
 import { onDragEnd } from "./controllers/dragAndDrop";
 
@@ -36,6 +37,7 @@ const App = () => {
         }}
       >
         <div style={{ minWidth: 250 }}>
+          <TopNavbar />
           <Sidebar />
         </div>
 

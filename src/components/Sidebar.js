@@ -11,7 +11,6 @@ import { observer } from "mobx-react-lite";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 
-import TopNavbar from "./TopNavbar";
 import PlaylistImporter from "./PlaylistImporter";
 import { UserPreferencesContext } from "../stores/preferences";
 import { PlaylistStoreContext } from "../stores/playlists";
@@ -30,11 +29,10 @@ export const Sidebar = () => {
     <div
       style={{
         backgroundColor: "white",
-        height: "100vh",
+        height: "calc(100vh - 100px)",
+        overflowY: "scroll",
       }}
     >
-      <TopNavbar />
-
       <div
         style={{
           display: "flex",
