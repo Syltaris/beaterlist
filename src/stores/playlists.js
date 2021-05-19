@@ -235,7 +235,7 @@ class PlaylistStore {
 
   addPlaylistFromBplistData = async (data) => {
     // do preloading here for multiple songs
-    await beatSaverSongCache.retrieveMultipleSongData(
+    const loadedSongHashes = await beatSaverSongCache.retrieveMultipleSongData(
       data.songs.map((song) => song.hash)
     );
     const playlist = new Playlist(
@@ -244,7 +244,7 @@ class PlaylistStore {
         image: data.image,
         title: data.playlistTitle,
         author: data.playlistAuthor,
-        songs: data.songs,
+        songs: data.songs.filter((s) => loadedSongHashes.includes(s.hash)),
       },
       this
     );
