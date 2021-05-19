@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { observer } from "mobx-react-lite";
+import { observer, Observer } from "mobx-react-lite";
 
 import {
   Table,
@@ -81,15 +81,19 @@ export const SongList = ({ playlist }) => {
         <Droppable key={playlist.id} droppableId={playlist.id}>
           {(provided, snapshot) => (
             <div ref={provided.innerRef} style={{ minHeight: "40px" }}>
-              {playlist.songs.map((song, idx) => (
-                <DraggableRow
-                  key={song.hash}
-                  idx={idx}
-                  playlistId={playlist.id}
-                  song={song}
-                  onRemoveSongClick={(song) => setSongToRemove(song)}
-                />
-              ))}
+              <Observer>
+                {() =>
+                  playlist.songs.map((song, idx) => (
+                    <DraggableRow
+                      key={song.hash}
+                      idx={idx}
+                      playlistId={playlist.id}
+                      song={song}
+                      onRemoveSongClick={(song) => setSongToRemove(song)}
+                    />
+                  ))
+                }
+              </Observer>
               {provided.placeholder}
             </div>
           )}

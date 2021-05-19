@@ -73,6 +73,12 @@ export const Navbar = () => {
             incognito mode, or clear the browser data, ALL of the data will be
             lost!
           </Paragraph>
+          <Paragraph marginTop={10}>
+            If you run into issues (crashing/white out) when importing multiple
+            playlists, try importing them in smaller batches. Clear the browser
+            data to resolve the issue. BeatSaver APIs need to be rate limited so
+            we can't retrieve too much data too quickly from them :(
+          </Paragraph>
           <Paragraph marginTop={10}>So, do backup your data often :)</Paragraph>
 
           <Heading marginTop={20}>How to use</Heading>

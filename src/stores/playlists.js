@@ -96,7 +96,7 @@ export class Playlist {
     }
 
     beatSaverSongCache.manualAddSongData(songData);
-    this._songs.push(new Song({ hash: songData.hash }));
+    this.songs.push(new Song({ hash: songData.hash }));
     this.store.saveAllPlaylists(); // quite expensive, should only save itself in the future
 
     return songData;
