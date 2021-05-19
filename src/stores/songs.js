@@ -37,6 +37,12 @@ export class Song {
   get description() {
     return this.beatSaverSongObject?.description;
   }
+  get duration() {
+    var date = new Date(0);
+    date.setSeconds(this.beatSaverSongObject?.metadata.duration); // specify value for SECONDS here
+    var timeString = date.toISOString().substr(14, 5);
+    return timeString;
+  }
 
   get downloads() {
     return this.beatSaverSongObject?.stats.downloads;

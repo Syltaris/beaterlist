@@ -7,6 +7,7 @@ const bplistSongKeys = [
   "name",
   "songAuthor",
   "levelAuthor",
+  "duration",
   "difficulties",
   "downloads",
   "plays",
