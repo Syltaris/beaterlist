@@ -53,8 +53,8 @@ const BeatSaverBrowser = () => {
       </div>
       <Text>
         Drag songs from here to your playlists to add songs directly. Currently,
-        you can only either filter by category, or do a search, but not in
-        conjunction with each other.
+        you can only either filter by category, or do a search, but not with
+        each other.
       </Text>
       <div
         style={{

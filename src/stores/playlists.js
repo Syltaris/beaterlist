@@ -181,11 +181,11 @@ class PlaylistStore {
       },
       this
     );
-    this.appendPlaylist(playlist);
+    this.appendPlaylistToTop(playlist);
   }
 
-  appendPlaylist(playlist) {
-    this._playlists.push(playlist);
+  appendPlaylistToTop(playlist) {
+    this._playlists.splice(0, 0, playlist);
     this.saveAllPlaylists();
   }
 
