@@ -33,7 +33,7 @@ const PlaylistsViewer = observer(({ userPreferences, playlistStore }) => {
           <div
             ref={provided.innerRef}
             style={{
-              width: horizontalMode ? "100%" : "50%",
+              width: horizontalMode ? "100%" : "100%",
               minWidth: "600px",
               height: "100vh",
 

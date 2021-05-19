@@ -62,6 +62,9 @@ const onClick = (songData) => {
 
 export const PreviewButton = ({ songData }) => (
   <IconButton
+    intent={
+      AudioPlayer.previewingSongHash === songData.hash ? "success" : undefined
+    }
     isLoading={
       AudioPlayer.previewingSongHash === songData.hash && AudioPlayer.loading
     }
