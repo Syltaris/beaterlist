@@ -20,19 +20,15 @@ const previewSong = async (song) => {
   if (eggFile) {
     // try to play file?
     const file = await eggFile[1].async("arraybuffer");
-    console.log(file);
-
     const blob = new Blob([file], { type: "audio/wav" });
 
     const reader = new FileReader();
     reader.onload = function (e) {
-      console.log(e);
       AudioPlayer.playSongSrc(window.URL.createObjectURL(blob));
       AudioPlayer.loading = false;
     };
     reader.readAsArrayBuffer(blob);
   }
-  console.log(song, eggFile);
 };
 
 const getButtonIcon = (songData) => {
@@ -59,6 +55,7 @@ const onClick = (songData) => {
 
   if (AudioPlayer.paused) {
     AudioPlayer.play();
+    return;
   }
   AudioPlayer.pause();
 };

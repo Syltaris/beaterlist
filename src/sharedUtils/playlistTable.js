@@ -42,7 +42,7 @@ export const getColText = (key, song) => {
 
 export const getTableCellPropsForCol = (key) => {
   let props = {
-    flexBasis: 120,
+    flexBasis: 200,
     flexGrow: 0,
     flexShrink: 0,
   };
