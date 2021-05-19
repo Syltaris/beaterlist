@@ -7,7 +7,6 @@ import PlaylistsContainer from "./components/PlaylistsContainer";
 import BeatSaverBrowser from "./components/BeatSaverBrowser/";
 import { UserPreferencesContext } from "./stores/preferences";
 import Sidebar from "./components/Sidebar";
-import TopNavbar from "./components/TopNavbar";
 
 import { onDragEnd } from "./controllers/dragAndDrop";
 
@@ -26,9 +25,9 @@ import { onDragEnd } from "./controllers/dragAndDrop";
 // more columns, beautified difficulties
 // drag and drop cleanup
 // export all?
+// reorder playlists
 
 // play preview?
-// reorder playlists
 // sidebar should be 'fixed' (with browser)
 
 const App = () => {
@@ -42,6 +41,7 @@ const App = () => {
         flexDirection: "column",
         alignItems: "center",
         border: "default",
+        backgroundColor: "#f9f9f9",
       }}
     >
       <div
@@ -51,8 +51,7 @@ const App = () => {
           display: "flex",
         }}
       >
-        <div style={{ minWidth: 300 }}>
-          <TopNavbar />
+        <div style={{ minWidth: 250 }}>
           <Sidebar />
         </div>
 

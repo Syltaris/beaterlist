@@ -42,6 +42,7 @@ const BeatSaverBrowser = () => {
       height="100vh"
       paddingLeft="20px"
       paddingRight="20px"
+      backgroundColor="white"
     >
       <div style={{ display: "flex", flexDirection: "row" }}>
         <Heading marginTop="10px" marginBottom="10px">

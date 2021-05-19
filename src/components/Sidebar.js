@@ -11,6 +11,7 @@ import { observer } from "mobx-react-lite";
 import { saveAs } from "file-saver";
 import JSZip from "jszip";
 
+import TopNavbar from "./TopNavbar";
 import PlaylistImporter from "./PlaylistImporter";
 import { UserPreferencesContext } from "../stores/preferences";
 import { PlaylistStoreContext } from "../stores/playlists";
@@ -28,16 +29,20 @@ export const Sidebar = () => {
   return (
     <div
       style={{
-        paddingLeft: 30,
-        paddingRight: 30,
+        backgroundColor: "white",
+        height: "100vh",
       }}
     >
+      <TopNavbar />
+
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           paddingTop: 20,
           paddingBottom: 20,
+          paddingLeft: 30,
+          paddingRight: 30,
         }}
       >
         <Button
@@ -109,26 +114,28 @@ export const Sidebar = () => {
           Export all playlists
         </Button>
       </div>
-      <Heading>Playlists Config</Heading>
-      <Checkbox
-        label="Horizontal Mode"
-        checked={horizontalMode}
-        onChange={(e) => {
-          preferences.playlistHorizontalMode = e.target.checked;
-        }}
-      />
-
-      <Heading>Columns To Show</Heading>
-      {Object.keys(preferences.playlistColumnsToShow).map((key) => (
+      <div style={{ paddingLeft: 20, paddingRight: 20 }}>
+        <Heading>Playlists Config</Heading>
         <Checkbox
-          key={key}
-          label={camelCaseToWords(key)}
-          checked={columnsToShow[key]}
-          onChange={(e) =>
-            preferences.setPlaylistColumnToShow(key, e.target.checked)
-          }
+          label="Horizontal Mode"
+          checked={horizontalMode}
+          onChange={(e) => {
+            preferences.playlistHorizontalMode = e.target.checked;
+          }}
         />
-      ))}
+
+        <Heading>Columns To Show</Heading>
+        {Object.keys(preferences.playlistColumnsToShow).map((key) => (
+          <Checkbox
+            key={key}
+            label={camelCaseToWords(key)}
+            checked={columnsToShow[key]}
+            onChange={(e) =>
+              preferences.setPlaylistColumnToShow(key, e.target.checked)
+            }
+          />
+        ))}
+      </div>
     </div>
   );
 };

@@ -4,7 +4,7 @@ import { observer } from "mobx-react-lite"; // may not need it
 export const Navbar = () => (
   <Pane
     width="100%"
-    height="300px"
+    height="250px"
     display="flex"
     flexDirection="column"
     justifyContent="center"
