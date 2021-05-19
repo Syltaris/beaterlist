@@ -167,7 +167,7 @@ const BeatSaverBrowser = () => {
       <Pagination
         // beat saver uses 0 indexed pages
         page={songStore.page + 1}
-        totalPages={songStore.totalPages}
+        totalPages={songStore.totalPages + 1}
         onPageChange={(page) => {
           songStore.page = page - 1;
           songStore.fetchSongs();

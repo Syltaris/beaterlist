@@ -12,6 +12,6 @@ export const getBeatSaverMapList = async (page, type) => {
 
 export const searchBeatSaverMapList = async (page, search) => {
   return (
-    await fetch(`https://beatsaver.com/api/search/text/?q=${search}&${page}`)
+    await fetch(`https://beatsaver.com/api/search/text/${page}?q=${search}`)
   ).json();
 };
