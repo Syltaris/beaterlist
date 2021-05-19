@@ -68,6 +68,29 @@ export const Header = ({ playlist }) => {
 
   const [titleInput, setTitleInput] = useState(playlist.title);
   const [authorInput, setAuthorInput] = useState(playlist.author);
+
+  const onSongKeyAdd = async () => {
+    try {
+      setAddSongError(false);
+      setShowAddSongLoader(true);
+      const addedSongData = await playlist.addSongByKey(songKeyInput);
+      toaster.success(`${addedSongData.name} added to ${playlist.title}.`);
+      window.gtag("event", "addNewSongByKeySuccess", {
+        event_category: "playlist",
+        event_label: "addNewSongByKeySuccess",
+      });
+    } catch (err) {
+      setAddSongError(true);
+      toaster.danger(err.message);
+      window.gtag("event", "addNewSongByKeyFail", {
+        event_category: "playlist",
+        event_label: "addNewSongByKeyFail",
+      });
+    } finally {
+      setShowAddSongLoader(false);
+    }
+  };
+
   return (
     <Pane
       display="flex"
@@ -227,29 +250,7 @@ export const Header = ({ playlist }) => {
         isShown={showAddDialog}
         title={`Add new song to ${playlist.title}`}
         onCloseComplete={() => setShowAddDialog(false)}
-        onConfirm={async () => {
-          try {
-            setAddSongError(false);
-            setShowAddSongLoader(true);
-            const addedSongData = await playlist.addSongByKey(songKeyInput);
-            toaster.success(
-              `${addedSongData.name} added to ${playlist.title}.`
-            );
-            window.gtag("event", "addNewSongByKeySuccess", {
-              event_category: "playlist",
-              event_label: "addNewSongByKeySuccess",
-            });
-          } catch (err) {
-            setAddSongError(true);
-            toaster.danger(err.message);
-            window.gtag("event", "addNewSongByKeyFail", {
-              event_category: "playlist",
-              event_label: "addNewSongByKeyFail",
-            });
-          } finally {
-            setShowAddSongLoader(false);
-          }
-        }}
+        onConfirm={onSongKeyAdd}
         confirmLabel={"Add"}
       >
         {showAddSongLoader && <Spinner />}
@@ -260,6 +261,11 @@ export const Header = ({ playlist }) => {
           isInvalid={addSongError}
           value={songKeyInput}
           onChange={(e) => setSongKeyInput(e.target.value)}
+          onKeyPress={(e) => {
+            if (e.key === "Enter") {
+              onSongKeyAdd();
+            }
+          }}
         ></TextInput>
       </Dialog>
     </Pane>
