@@ -40,8 +40,8 @@ export const Sidebar = () => {
           flexDirection: "column",
           paddingTop: 20,
           paddingBottom: 20,
-          paddingLeft: 30,
-          paddingRight: 30,
+          paddingLeft: 20,
+          paddingRight: 20,
         }}
       >
         <Button

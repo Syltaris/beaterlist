@@ -41,8 +41,9 @@ export const getColText = (key, song) => {
 };
 
 export const getTableCellPropsForCol = (key) => {
+  // levelAuthor, songAuthor, difficulties
   let props = {
-    flexBasis: 200,
+    flexBasis: 150,
     flexGrow: 0,
     flexShrink: 0,
   };
@@ -52,21 +53,33 @@ export const getTableCellPropsForCol = (key) => {
       flexGrow: 0,
       flexShrink: 0,
     };
-  } else if (key === "difficulties") {
+  } else if (key === "hash") {
     props = {
-      flexBasis: 150,
+      flexBasis: 300,
+      flexGrow: 0,
+      flexShrink: 0,
+    };
+  } else if (key === "name") {
+    props = {
+      flexBasis: 200,
+      flexGrow: 0,
+      flexShrink: 0,
+    };
+  } else if (key === "uploadDate") {
+    props = {
+      flexBasis: 120,
+      flexGrow: 0,
+      flexShrink: 0,
+    };
+  } else if (key === "duration") {
+    props = {
+      flexBasis: 90,
       flexGrow: 0,
       flexShrink: 0,
     };
   } else if (key === "cover") {
     props = {
       flexBasis: 60,
-      flexGrow: 0,
-      flexShrink: 0,
-    };
-  } else if (key === "hash") {
-    props = {
-      flexBasis: 300,
       flexGrow: 0,
       flexShrink: 0,
     };

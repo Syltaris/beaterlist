@@ -39,7 +39,8 @@ const BeatSaverBrowser = () => {
 
   return (
     <Pane
-      maxWidth="600px"
+      minWidth="400px"
+      maxWidth="calc(50% - 250px)"
       height="100vh"
       paddingLeft="20px"
       paddingRight="20px"
