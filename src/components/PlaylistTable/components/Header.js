@@ -17,6 +17,7 @@ import {
   IconButton,
   TickIcon,
   CrossIcon,
+  ShareIcon,
   Text,
   toaster,
 } from "evergreen-ui";
@@ -181,6 +182,21 @@ export const Header = ({ playlist }) => {
                 value: !editTextData,
               });
               setEditTextData(!editTextData);
+            }}
+            marginLeft="2px"
+          />
+        </Tooltip>
+        <Tooltip content="Create sharable import link">
+          <IconButton
+            icon={ShareIcon}
+            onClick={() => {
+              mixpanel.track("playlistShareClicked", {
+                event_category: "playlist",
+                event_label: "playlistShareClicked",
+              });
+              navigator.clipboard.writeText(playlist.sharableImportLink);
+              toaster.success("Link copied to clipboard.");
+              console.log(playlist.sharableImportLink);
             }}
             marginLeft="2px"
           />

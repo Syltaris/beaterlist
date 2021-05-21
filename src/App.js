@@ -5,6 +5,7 @@ import { DragDropContext } from "react-beautiful-dnd";
 import { toaster } from "evergreen-ui";
 import PlaylistsContainer from "./components/PlaylistsContainer";
 import BeatSaverBrowser from "./components/BeatSaverBrowser/";
+import DeepPlaylistImportDialog from "./components/DeepPlaylistImportDialog";
 import { UserPreferencesContext } from "./stores/preferences";
 import Sidebar from "./components/Sidebar";
 import TopNavbar from "./components/TopNavbar";
@@ -15,6 +16,7 @@ import background from "./assets/background/tile.png";
 
 const App = () => {
   const preferences = useContext(UserPreferencesContext);
+  console.log("rerends...");
   return (
     <div
       style={{
@@ -29,6 +31,8 @@ const App = () => {
         backgroundSize: "200px 200px",
       }}
     >
+      <DeepPlaylistImportDialog />
+
       <div
         style={{
           width: "100%",

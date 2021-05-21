@@ -29,6 +29,9 @@ export class Playlist {
   get id() {
     return this._id;
   }
+  set id(id) {
+    this._id = id;
+  }
 
   get image() {
     return this._image;
@@ -60,6 +63,18 @@ export class Playlist {
   set songs(songs) {
     this._songs = songs;
     this.store.savePlaylist(this);
+  }
+
+  get sharableImportLink() {
+    const playlistJson = this.asJson();
+    delete playlistJson.id;
+    delete playlistJson.image;
+
+    const link = `${
+      window.location.origin
+    }/#importPlaylistJson=${encodeURIComponent(JSON.stringify(playlistJson))}`;
+
+    return link;
   }
 
   delete() {
