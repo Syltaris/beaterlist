@@ -34,12 +34,21 @@ export class Song {
   get difficulties() {
     return this.beatSaverSongObject?.metadata.difficulties;
   }
+
   get description() {
     return this.beatSaverSongObject?.description;
   }
   get duration() {
     var date = new Date(0);
-    date.setSeconds(this.beatSaverSongObject?.metadata.duration); // specify value for SECONDS here
+    let duration = this.beatSaverSongObject?.metadata.duration;
+    if (duration === 0) {
+      // find from characteristics/difficulties (assumes at least 1 char?)
+      duration = this.beatSaverSongObject?.metadata.characteristics[0].find(
+        (c) => Object.values(c.difficulties).find((d) => d && d.duration)
+      );
+    }
+
+    date.setSeconds(duration); // specify value for SECONDS here
     var timeString = date.toISOString().substr(14, 5);
     return timeString;
   }
