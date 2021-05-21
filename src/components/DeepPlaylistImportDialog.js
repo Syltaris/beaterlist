@@ -38,16 +38,19 @@ const DeepPlaylistImportDialog = () => {
   const [playlistToAdd, setPlaylistToAdd] = useState(null);
   const [showDialog, setShowDialog] = useState(!!playlistJson);
 
-  useEffect(async () => {
-    if (!!playlistJson) {
-      setLoading(true);
-      await beatSaverSongCache.retrieveMultipleSongData(
-        playlistJson.songs.map((s) => s.hash)
-      );
-      setLoading(false);
+  useEffect(() => {
+    const fetchSongs = async () => {
+      if (!!playlistJson) {
+        setLoading(true);
+        await beatSaverSongCache.retrieveMultipleSongData(
+          playlistJson.songs.map((s) => s.hash)
+        );
+        setLoading(false);
 
-      setPlaylistToAdd(new Playlist(playlistJson, playlistStore));
-    }
+        setPlaylistToAdd(new Playlist(playlistJson, playlistStore));
+      }
+    };
+    fetchSongs();
   }, [playlistStore]);
 
   return (
