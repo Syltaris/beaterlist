@@ -196,7 +196,6 @@ export const Header = ({ playlist }) => {
               });
               navigator.clipboard.writeText(playlist.sharableImportLink);
               toaster.success("Link copied to clipboard.");
-              console.log(playlist.sharableImportLink);
             }}
             marginLeft="2px"
           />

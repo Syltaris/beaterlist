@@ -2,16 +2,21 @@ import { useState, useContext, useEffect } from "react";
 import { Playlist, PlaylistStoreContext } from "../stores/playlists";
 import { beatSaverSongCache } from "../stores/beatSaver";
 import { observer } from "mobx-react-lite";
+import mixpanel from "mixpanel-browser";
 
 import { Dialog, Table, Avatar, toaster, Spinner, Text } from "evergreen-ui";
 import React from "react";
 
 function removeHash() {
-  window.history.pushState(
-    "",
-    document.title,
-    window.location.pathname + window.location.search
-  );
+  if (window.location.protocol === "https:") {
+    window.history.pushState(
+      "",
+      document.title,
+      window.location.pathname + window.location.search
+    );
+  } else {
+    window.location.hash = "";
+  }
 }
 
 let playlistJson;
@@ -47,6 +52,11 @@ const DeepPlaylistImportDialog = () => {
         );
         setLoading(false);
 
+        mixpanel.track("playlistDeepImporterOpened", {
+          event_category: "playlistDeeplink",
+          event_label: "playlistDeepImporterOpened",
+        });
+
         setPlaylistToAdd(new Playlist(playlistJson, playlistStore));
       }
     };
@@ -68,6 +78,10 @@ const DeepPlaylistImportDialog = () => {
       }}
       isConfirmDisabled={loading}
       onConfirm={async () => {
+        mixpanel.track("playlistDeepImporterConfirmPressed", {
+          event_category: "playlistDeeplink",
+          event_label: "playlistDeepImporterConfirmPressed",
+        });
         playlistToAdd.id = playlistStore.getNewId();
         playlistStore.appendPlaylistToTop(playlistToAdd);
 

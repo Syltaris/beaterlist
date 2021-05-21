@@ -71,8 +71,8 @@ export class Playlist {
     delete playlistJson.image;
 
     const link = `${
-      window.location.origin
-    }/#importPlaylistJson=${encodeURIComponent(JSON.stringify(playlistJson))}`;
+      window.location.origin + window.location.pathname
+    }#importPlaylistJson=${encodeURIComponent(JSON.stringify(playlistJson))}`;
 
     return link;
   }
