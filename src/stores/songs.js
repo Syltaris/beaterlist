@@ -44,7 +44,36 @@ export class Song {
     return this.beatSaverSongObject?.metadata.levelAuthorName;
   }
   get difficulties() {
-    return this.beatSaverSongObject?.metadata.difficulties;
+    if (!this.beatSaverSongObject) {
+      return [];
+    }
+    return Object.entries(this.beatSaverSongObject.metadata.difficulties)
+      .filter(([_, flag]) => flag)
+      .map(([key, _]) => key);
+  }
+  get nps() {
+    const nps = {};
+    if (!this.beatSaverSongObject) {
+      return nps;
+    }
+    for (const difficulty of this.difficulties) {
+      const charNps = [];
+      for (const char of this.beatSaverSongObject.metadata.characteristics) {
+        const diff = char.difficulties[difficulty];
+        if (diff) {
+          const calcNps =
+            diff.notes === 0
+              ? 0
+              : Number.parseFloat(diff.duration / diff.notes).toPrecision(2);
+          charNps.push({
+            [char.name]: calcNps,
+          });
+        }
+      }
+      nps[difficulty] = charNps;
+    }
+
+    return nps;
   }
 
   get description() {
