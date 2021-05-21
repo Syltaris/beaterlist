@@ -53,10 +53,16 @@ export class Song {
   get duration() {
     var date = new Date(0);
     let duration = this.beatSaverSongObject?.metadata.duration;
+    if (!duration) {
+      return "?";
+    }
     if (duration === 0) {
       // find from characteristics/difficulties (assumes at least 1 char?)
       duration = this.beatSaverSongObject?.metadata.characteristics[0].find(
-        (c) => Object.values(c.difficulties).find((d) => d && d.duration)
+        (c) =>
+          Object.values(c.difficulties)
+            .filter((d) => d)
+            .find((d) => d.duration)
       );
     }
 

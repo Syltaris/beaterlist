@@ -1,4 +1,4 @@
-import { Badge, Table, Avatar } from "evergreen-ui";
+import { Badge, Table, Avatar, Tooltip } from "evergreen-ui";
 import { camelCaseToWords } from "../utils/string";
 
 export const difficultyBadgePropsMap = {
@@ -16,9 +16,11 @@ export const getDifficultyBadge = (difficultyKey) => {
   }
   const { text, color } = difficultyBadgePropsMap[difficultyKey];
   return (
-    <Badge key={difficultyKey} color={color}>
-      {text}
-    </Badge>
+    <Tooltip title="what, wer,wer">
+      <Badge key={difficultyKey} color={color}>
+        {text}
+      </Badge>
+    </Tooltip>
   );
 };
 
