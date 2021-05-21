@@ -202,6 +202,9 @@ export const Sidebar = () => {
             marginBottom="10px"
             accept=".dat"
             onChange={async (files) => {
+              if (files.length === 0) {
+                return;
+              }
               try {
                 setPlayerDataFile(null);
                 setPlayerDataFile(JSON.parse(await files[0].text()));
