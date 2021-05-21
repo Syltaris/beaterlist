@@ -62,9 +62,9 @@ export class Song {
         const diff = char.difficulties[difficulty];
         if (diff) {
           const calcNps =
-            diff.notes === 0
+            diff.duration === 0
               ? 0
-              : Number.parseFloat(diff.duration / diff.notes).toPrecision(2);
+              : Number.parseFloat(diff.notes / diff.duration).toPrecision(2);
           charNps.push({
             [char.name]: calcNps,
           });
