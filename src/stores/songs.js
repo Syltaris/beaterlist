@@ -1,18 +1,27 @@
 import { beatSaverSongCache } from "./beatSaver";
+import { makeAutoObservable } from "mobx";
 
 export class Song {
   _hash = null; // unique id
   beatSaverSongObject = undefined; // data object retrieve from beat-saver server
 
   constructor(savedSong, songData = null) {
+    makeAutoObservable(this);
     this._hash = savedSong.hash;
     if (songData === null) {
-      this.beatSaverSongObject = beatSaverSongCache.getSongDataByHash(
-        this.hash
-      );
+      beatSaverSongCache.getSongDataByHash(this.hash).then((songData) => {
+        this.beatSaverSongObject = songData;
+      });
     } else {
       this.beatSaverSongObject = songData;
     }
+  }
+
+  get beatSaverSongObject() {
+    return this._beatSaverSongObject;
+  }
+  set beatSaverSongObject(beatSaverSongObject) {
+    this._beatSaverSongObject = beatSaverSongObject;
   }
 
   get hash() {
@@ -20,7 +29,10 @@ export class Song {
   }
 
   get coverURL() {
-    return "https://beatsaver.com" + this.beatSaverSongObject?.coverURL;
+    return (
+      this.beatSaverSongObject &&
+      "https://beatsaver.com" + this.beatSaverSongObject?.coverURL
+    );
   }
   get name() {
     return this.beatSaverSongObject?.metadata.songName;

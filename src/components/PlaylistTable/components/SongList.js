@@ -28,33 +28,36 @@ const DraggableRow = ({ idx, playlistId, song, onRemoveSongClick }) => {
       index={idx}
     >
       {(provided) => (
-        <Table.Row
-          key={song.hash}
-          isSelectable
-          height={42}
-          ref={provided.innerRef}
-          {...provided.draggableProps}
-          {...provided.dragHandleProps}
-        >
-          <Table.Cell flexBasis={40} flexGrow={0} flexShrink={0}>
-            <DragHandleHorizontalIcon />
-          </Table.Cell>
-          {columnsToShow.map((key) => getTableCellForCol(key, song))}
-          <Table.Cell
-            flexBasis={35}
-            flexGrow={0}
-            flexShrink={0}
-            marginRight={0}
-            marginLeft="auto"
-          >
-            <DeleteIcon onClick={() => onRemoveSongClick(song)} />
-          </Table.Cell>
-        </Table.Row>
+        <Observer>
+          {() => (
+            <Table.Row
+              key={song.hash}
+              isSelectable
+              height={42}
+              ref={provided.innerRef}
+              {...provided.draggableProps}
+              {...provided.dragHandleProps}
+            >
+              <Table.Cell flexBasis={40} flexGrow={0} flexShrink={0}>
+                <DragHandleHorizontalIcon />
+              </Table.Cell>
+              {columnsToShow.map((key) => getTableCellForCol(key, song))}
+              <Table.Cell
+                flexBasis={35}
+                flexGrow={0}
+                flexShrink={0}
+                marginRight={0}
+                marginLeft="auto"
+              >
+                <DeleteIcon onClick={() => onRemoveSongClick(song)} />
+              </Table.Cell>
+            </Table.Row>
+          )}
+        </Observer>
       )}
     </Draggable>
   );
 };
-
 export const SongList = ({ playlist }) => {
   const preferences = useContext(UserPreferencesContext);
   const columnsToShow = preferences.getPlaylistColumnNamesToShow();

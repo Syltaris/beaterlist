@@ -77,6 +77,10 @@ export class Playlist {
     this.store.savePlaylist(this);
   }
 
+  addSongByHash(songHash) {
+    this.songs.push(new Song({ hash: songHash }));
+  }
+
   async addSongByKey(songKey) {
     /* try to find song in beat-saver
      if have, save the data, and the song, save the playlist after
@@ -193,6 +197,7 @@ class PlaylistStore {
       this
     );
     this.appendPlaylistToTop(playlist);
+    return playlist;
   }
 
   appendPlaylistToTop(playlist) {

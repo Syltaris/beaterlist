@@ -7,6 +7,9 @@ import {
   toaster,
   ChevronLeftIcon,
   ChevronRightIcon,
+  Dialog,
+  FilePicker,
+  Text,
 } from "evergreen-ui";
 import { observer } from "mobx-react-lite";
 import { saveAs } from "file-saver";
@@ -16,6 +19,7 @@ import PlaylistImporter from "./PlaylistImporter";
 import { UserPreferencesContext } from "../stores/preferences";
 import { PlaylistStoreContext } from "../stores/playlists";
 import { camelCaseToWords } from "../utils/string";
+import PlayerDataFileViewer from "./PlayerDataFileViewer";
 
 export const Sidebar = () => {
   const preferences = useContext(UserPreferencesContext);
@@ -26,6 +30,9 @@ export const Sidebar = () => {
 
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [playerDataFile, setPlayerDataFile] = useState(null);
+  const [showImportPlayerDataDialog, setShowImportPlayerDataDialog] =
+    useState(false);
   return (
     <div
       style={{
@@ -161,6 +168,51 @@ export const Sidebar = () => {
             }}
           />
         ))}
+
+        <Heading>Advanced</Heading>
+        <div style={{ marginTop: 10 }}>
+          <Button
+            onClick={() => {
+              mixpanel.track("importPlayerDataButton", {
+                event_category: "sidebarConfig",
+                event_label: "importPlayerDataButton",
+              });
+              setShowImportPlayerDataDialog(true);
+            }}
+            marginBottom="10px"
+          >
+            Import PlayerData.dat file
+          </Button>
+        </div>
+        <Dialog
+          hasFooter={false}
+          isShown={showImportPlayerDataDialog}
+          onCloseComplete={() => {
+            setShowImportPlayerDataDialog(false);
+            setPlayerDataFile(null);
+          }}
+          title="Import PlayerData.dat"
+        >
+          <Text>
+            You can import your PlayerData.dat file from your AppData folder (or
+            from Quest app folder) and then do certain actions with it.
+          </Text>
+          <FilePicker
+            marginTop="10px"
+            marginBottom="10px"
+            accept=".dat"
+            onChange={async (files) => {
+              try {
+                setPlayerDataFile(null);
+                setPlayerDataFile(JSON.parse(await files[0].text()));
+              } catch (err) {
+                console.error(err);
+                toaster.danger("Could not parse .dat file. Is the file valid?");
+              }
+            }}
+          />
+          {playerDataFile && <PlayerDataFileViewer jsonFile={playerDataFile} />}
+        </Dialog>
       </div>
     </div>
   );
