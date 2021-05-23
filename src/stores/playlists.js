@@ -2,6 +2,7 @@ import { createContext } from "react";
 import store from "store";
 import { makeAutoObservable } from "mobx";
 import { v4 as uuidv4 } from "uuid";
+import { JSONCrush } from "jsoncrush";
 
 import { Song } from "./songs";
 import { beatSaverSongCache } from "./beatSaver";
@@ -72,7 +73,7 @@ export class Playlist {
 
     const link = `${
       window.location.origin + window.location.pathname
-    }#importPlaylistJson=${encodeURIComponent(JSON.stringify(playlistJson))}`;
+    }#importPlaylistJson=${JSONCrush(JSON.stringify(playlistJson))}`;
 
     return link;
   }

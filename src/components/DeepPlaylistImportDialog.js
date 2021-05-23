@@ -3,6 +3,7 @@ import { Playlist, PlaylistStoreContext } from "../stores/playlists";
 import { beatSaverSongCache } from "../stores/beatSaver";
 import { observer } from "mobx-react-lite";
 import mixpanel from "mixpanel-browser";
+import { JSONUncrush } from "jsoncrush";
 
 import { Dialog, Table, Avatar, toaster, Spinner, Text } from "evergreen-ui";
 import React from "react";
@@ -21,10 +22,12 @@ function removeHash() {
 
 let playlistJson;
 if (window.location.hash.includes("#importPlaylistJson=")) {
-  const rawJsonString = decodeURIComponent(
-    window.location.hash.substr(
-      "#importPlaylistJson=".length,
-      window.location.hash.length
+  const rawJsonString = JSONUncrush(
+    decodeURIComponent(
+      window.location.hash.substr(
+        "#importPlaylistJson=".length,
+        window.location.hash.length
+      )
     )
   );
   const jsonString = JSON.parse(rawJsonString);
