@@ -16,7 +16,6 @@ import background from "./assets/background/tile.png";
 
 const App = () => {
   const preferences = useContext(UserPreferencesContext);
-  console.log("rerends...");
   return (
     <div
       style={{
