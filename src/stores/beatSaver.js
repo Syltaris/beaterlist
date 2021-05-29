@@ -114,32 +114,38 @@ class BeatSaverSongCache {
     if (!(hash in this.songCache)) {
       const resp = await getMapByHash(hash);
       this.songCache[hash] = resp;
+      store.set("songCache", this.songCache);
     } // else, skip (unless needs to overwrite for some reason?)
-
-    store.set("songCache", this.songCache);
   }
 
   // would love to use Promise.all if no rate limit :(
   async retrieveMultipleSongData(hashes, rateLimitDelay = 500) {
-    const missingHashes = hashes.filter((hash) => !(hash in this.songCache));
-    const loadedSongHashes = [];
+    const missingHashes = [];
+    const presentSongHashes = [];
+    for (const hash of hashes) {
+      if (hash in this.songCache) {
+        presentSongHashes.push(hash);
+      } else {
+        missingHashes.push(hash);
+      }
+    }
     for (const hash of missingHashes) {
       try {
         const resp = await getMapByHash(hash);
         this.songCache[hash] = resp;
-        loadedSongHashes.push(hash);
+        presentSongHashes.push(hash);
       } catch (err) {
         console.error(err);
       }
       await new Promise((res) => setTimeout(res, rateLimitDelay)); // sleep
     }
     store.set("songCache", this.songCache);
-    return loadedSongHashes;
+    return presentSongHashes;
   }
 
-  getSongDataByHash(hash) {
+  async getSongDataByHash(hash) {
     if (!(hash in this.songCache)) {
-      this.retrieveSongData(hash);
+      await this.retrieveSongData(hash);
     }
     return this.songCache[hash];
   }

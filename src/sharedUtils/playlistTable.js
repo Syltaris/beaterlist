@@ -1,4 +1,4 @@
-import { Badge, Table, Avatar } from "evergreen-ui";
+import { Badge, Table, Avatar, Tooltip, Position } from "evergreen-ui";
 import { camelCaseToWords } from "../utils/string";
 
 export const difficultyBadgePropsMap = {
@@ -9,16 +9,21 @@ export const difficultyBadgePropsMap = {
   expertPlus: { text: "E+", color: "purple" },
 };
 
-export const getDifficultyBadge = (difficultyKey) => {
+export const getDifficultyBadge = (difficultyKey, song) => {
   if (!(difficultyKey in difficultyBadgePropsMap)) {
     console.error("missing difficulty key: ", difficultyKey);
     return;
   }
+  const npsText = `${song.nps[difficultyKey]
+    .map((obj) => Object.entries(obj).map(([key, nps]) => `${key}: ${nps}`))
+    .join(", ")}`;
   const { text, color } = difficultyBadgePropsMap[difficultyKey];
   return (
-    <Badge key={difficultyKey} color={color}>
-      {text}
-    </Badge>
+    <Tooltip content={npsText} position={Position.TOP}>
+      <Badge key={difficultyKey} color={color}>
+        {text}
+      </Badge>
+    </Tooltip>
   );
 };
 
@@ -111,14 +116,12 @@ export const getTableCellForCol = (key, song) => {
   if (key === "difficulties") {
     return (
       <Table.Cell key={key} {...getTableCellPropsForCol(key)}>
-        {Object.entries(song.difficulties)
-          .filter(([_, flag]) => flag)
-          .map(([difficultyKey, _]) => difficultyKey)
+        {song.difficulties
           .sort((k1, k2) => {
             const difficultyKeys = Object.keys(difficultyBadgePropsMap);
             return difficultyKeys.indexOf(k1) - difficultyKeys.indexOf(k2);
           })
-          .map((difficultyKey) => getDifficultyBadge(difficultyKey))}
+          .map((difficultyKey) => getDifficultyBadge(difficultyKey, song))}
       </Table.Cell>
     );
   }

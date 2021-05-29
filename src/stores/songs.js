@@ -1,18 +1,27 @@
 import { beatSaverSongCache } from "./beatSaver";
+import { makeAutoObservable } from "mobx";
 
 export class Song {
   _hash = null; // unique id
   beatSaverSongObject = undefined; // data object retrieve from beat-saver server
 
   constructor(savedSong, songData = null) {
+    makeAutoObservable(this);
     this._hash = savedSong.hash;
     if (songData === null) {
-      this.beatSaverSongObject = beatSaverSongCache.getSongDataByHash(
-        this.hash
-      );
+      beatSaverSongCache.getSongDataByHash(this.hash).then((songData) => {
+        this.beatSaverSongObject = songData;
+      });
     } else {
       this.beatSaverSongObject = songData;
     }
+  }
+
+  get beatSaverSongObject() {
+    return this._beatSaverSongObject;
+  }
+  set beatSaverSongObject(beatSaverSongObject) {
+    this._beatSaverSongObject = beatSaverSongObject;
   }
 
   get hash() {
@@ -20,7 +29,10 @@ export class Song {
   }
 
   get coverURL() {
-    return "https://beatsaver.com" + this.beatSaverSongObject?.coverURL;
+    return (
+      this.beatSaverSongObject &&
+      "https://beatsaver.com" + this.beatSaverSongObject?.coverURL
+    );
   }
   get name() {
     return this.beatSaverSongObject?.metadata.songName;
@@ -32,14 +44,63 @@ export class Song {
     return this.beatSaverSongObject?.metadata.levelAuthorName;
   }
   get difficulties() {
-    return this.beatSaverSongObject?.metadata.difficulties;
+    if (!this.beatSaverSongObject) {
+      return [];
+    }
+    return Object.entries(this.beatSaverSongObject.metadata.difficulties)
+      .filter(([_, flag]) => flag)
+      .map(([key, _]) => key);
   }
+  get nps() {
+    const nps = {};
+    if (!this.beatSaverSongObject) {
+      return nps;
+    }
+    for (const difficulty of this.difficulties) {
+      const charNps = [];
+      for (const char of this.beatSaverSongObject.metadata.characteristics) {
+        const diff = char.difficulties[difficulty];
+        if (diff) {
+          const calcNps =
+            diff.duration === 0
+              ? 0
+              : Number.parseFloat(diff.notes / diff.duration).toPrecision(2);
+          charNps.push({
+            [char.name]: calcNps,
+          });
+        }
+      }
+      nps[difficulty] = charNps;
+    }
+
+    return nps;
+  }
+
   get description() {
     return this.beatSaverSongObject?.description;
   }
   get duration() {
     var date = new Date(0);
-    date.setSeconds(this.beatSaverSongObject?.metadata.duration); // specify value for SECONDS here
+    let duration = this.beatSaverSongObject?.metadata.duration;
+
+    if (duration === 0) {
+      // find from characteristics/difficulties (assumes at least 1 char?)
+      // needs cleanup
+      const characteristic =
+        this.beatSaverSongObject?.metadata.characteristics[0];
+      if (!characteristic) {
+        return "?";
+      }
+      duration = Object.values(characteristic.difficulties).find(
+        (d) => d && d.duration
+      )?.duration;
+    }
+    // if duration can't be found anywhere
+    if (!duration) {
+      return "?";
+    }
+
+    date.setSeconds(duration); // specify value for SECONDS here
     var timeString = date.toISOString().substr(14, 5);
     return timeString;
   }

@@ -2,6 +2,7 @@ import { createContext } from "react";
 import store from "store";
 import { makeAutoObservable } from "mobx";
 import { v4 as uuidv4 } from "uuid";
+import { JSONCrush } from "jsoncrush";
 
 import { Song } from "./songs";
 import { beatSaverSongCache } from "./beatSaver";
@@ -28,6 +29,9 @@ export class Playlist {
 
   get id() {
     return this._id;
+  }
+  set id(id) {
+    this._id = id;
   }
 
   get image() {
@@ -62,6 +66,18 @@ export class Playlist {
     this.store.savePlaylist(this);
   }
 
+  get sharableImportLink() {
+    const playlistJson = this.asJson();
+    delete playlistJson.id;
+    delete playlistJson.image;
+
+    const link = `${
+      window.location.origin + window.location.pathname
+    }#importPlaylistJson=${JSONCrush(JSON.stringify(playlistJson))}`;
+
+    return link;
+  }
+
   delete() {
     this.store.deletePlaylist(this);
   }
@@ -75,6 +91,10 @@ export class Playlist {
   insertSongAtIdx(song, idx) {
     this._songs.splice(idx, 0, song);
     this.store.savePlaylist(this);
+  }
+
+  addSongByHash(songHash) {
+    this.songs.push(new Song({ hash: songHash }));
   }
 
   async addSongByKey(songKey) {
@@ -193,6 +213,7 @@ class PlaylistStore {
       this
     );
     this.appendPlaylistToTop(playlist);
+    return playlist;
   }
 
   appendPlaylistToTop(playlist) {
