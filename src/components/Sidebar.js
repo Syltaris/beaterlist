@@ -121,7 +121,7 @@ export const Sidebar = () => {
             const zip = new JSZip();
             playlistStore.playlists.forEach((playlist, idx) => {
               zip.file(
-                `[${idx}]-${playlist.title}.bplist`,
+                `${playlist.title}_${playlist.id.substring(0, 5)}.bplist`,
                 JSON.stringify(playlist.asBplistJson())
               );
             });

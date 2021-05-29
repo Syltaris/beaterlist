@@ -29,7 +29,10 @@ const exportPlaylist = (playlist) => {
     "data:text/plain;charset=utf-8," +
       encodeURIComponent(JSON.stringify(playlist.asBplistJson()))
   );
-  element.setAttribute("download", `${playlist.title}.bplist`);
+  element.setAttribute(
+    "download",
+    `${playlist.title}_${playlist.id.substring(0, 5)}.bplist`
+  );
 
   element.style.display = "none";
   document.body.appendChild(element);
