@@ -34,7 +34,6 @@ class BeatSaverBrowserStore {
       if (this.search !== null && this.search !== "") {
         resp = await searchBeatSaverMapList(this.page, this.search);
       } else {
-        console.log(this.category);
         resp = await getBeatSaverMapList(this.page, this.category);
       }
     } catch (err) {

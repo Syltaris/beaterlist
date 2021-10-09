@@ -25,7 +25,7 @@ export class Song {
   }
 
   get id() {
-    return this.beatSaverSongObject?.id;
+    return this._id;
   }
   get key() {
     return this.id // for simplicity sake, since both are the same
@@ -37,6 +37,9 @@ export class Song {
 
   get coverURL() {
     return  this.beatSaverSongObject?.versions[0].coverURL
+  }
+  get previewURL() {
+    return  this.beatSaverSongObject?.versions[0].previewURL
   }
   get name() {
     return this.beatSaverSongObject?.metadata.songName;

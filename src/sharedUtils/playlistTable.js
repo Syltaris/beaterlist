@@ -113,9 +113,11 @@ export const getTableCellForCol = (key, song) => {
   }
 
   if (key === "difficulties") {
+    const difficulties = []
+    Object.assign(difficulties, song.difficulties)
     return (
       <Table.Cell key={key} {...getTableCellPropsForCol(key)}>
-        {song.difficulties
+        {difficulties
           .sort((k1, k2) => {
             const difficultyKeys = Object.keys(difficultyBadgePropsMap);
             return difficultyKeys.indexOf(k1.difficulty) - difficultyKeys.indexOf(k2.difficulty);
