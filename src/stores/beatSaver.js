@@ -9,17 +9,13 @@ import {
 } from "../controllers/api";
 
 export const beatSaverBrowserCategories = [
-  "hot",
-  "rating",
-  "latest",
-  "downloads",
   "plays",
 ];
 
 // beat saver server songs
 class BeatSaverBrowserStore {
   _songsList = [];
-  _totalPages = null;
+  _totalPages = 5000; // Current API doesn't seem to have last page... last checked total around 4200 pages
   _page = 0;
   _search = "";
   _category = beatSaverBrowserCategories[0];
@@ -38,12 +34,12 @@ class BeatSaverBrowserStore {
       if (this.search !== null && this.search !== "") {
         resp = await searchBeatSaverMapList(this.page, this.search);
       } else {
+        console.log(this.category);
         resp = await getBeatSaverMapList(this.page, this.category);
       }
     } catch (err) {
       throw err;
     }
-    this.totalPages = resp.lastPage;
     this.songsList = resp.docs;
     this.loading = false;
   };
