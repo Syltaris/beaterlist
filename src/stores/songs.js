@@ -2,14 +2,14 @@ import { beatSaverSongCache } from "./beatSaver";
 import { makeAutoObservable } from "mobx";
 
 export class Song {
-  _hash = null; // unique id
+  _id = null; // unique id
   beatSaverSongObject = undefined; // data object retrieve from beat-saver server
 
   constructor(savedSong, songData = null) {
     makeAutoObservable(this);
-    this._hash = savedSong.hash;
+    this._id = savedSong.id;
     if (songData === null) {
-      beatSaverSongCache.getSongDataByHash(this.hash).then((songData) => {
+      beatSaverSongCache.getSongDataById(this.id).then((songData) => {
         this.beatSaverSongObject = songData;
       });
     } else {
@@ -24,8 +24,12 @@ export class Song {
     this._beatSaverSongObject = beatSaverSongObject;
   }
 
-  get hash() {
-    return this._hash;
+  get id() {
+    return this.beatSaverSongObject?.id;
+  }
+  get hash(){
+    // not too sure, should be by the latest version's song hash
+    return this.beatSaverSongObject?.versions[0].hash
   }
 
   get coverURL() {
@@ -47,33 +51,7 @@ export class Song {
     if (!this.beatSaverSongObject) {
       return [];
     }
-    return Object.entries(this.beatSaverSongObject.metadata.difficulties)
-      .filter(([_, flag]) => flag)
-      .map(([key, _]) => key);
-  }
-  get nps() {
-    const nps = {};
-    if (!this.beatSaverSongObject) {
-      return nps;
-    }
-    for (const difficulty of this.difficulties) {
-      const charNps = [];
-      for (const char of this.beatSaverSongObject.metadata.characteristics) {
-        const diff = char.difficulties[difficulty];
-        if (diff) {
-          const calcNps =
-            diff.duration === 0
-              ? 0
-              : Number.parseFloat(diff.notes / diff.duration).toPrecision(2);
-          charNps.push({
-            [char.name]: calcNps,
-          });
-        }
-      }
-      nps[difficulty] = charNps;
-    }
-
-    return nps;
+    return this.beatSaverSongObject.versions[0].diffs // versions? assuming 1st is latest...
   }
 
   get description() {
@@ -82,24 +60,6 @@ export class Song {
   get duration() {
     var date = new Date(0);
     let duration = this.beatSaverSongObject?.metadata.duration;
-
-    if (duration === 0) {
-      // find from characteristics/difficulties (assumes at least 1 char?)
-      // needs cleanup
-      const characteristic =
-        this.beatSaverSongObject?.metadata.characteristics[0];
-      if (!characteristic) {
-        return "?";
-      }
-      duration = Object.values(characteristic.difficulties).find(
-        (d) => d && d.duration
-      )?.duration;
-    }
-    // if duration can't be found anywhere
-    if (!duration) {
-      return "?";
-    }
-
     date.setSeconds(duration); // specify value for SECONDS here
     var timeString = date.toISOString().substr(14, 5);
     return timeString;
@@ -125,78 +85,93 @@ export class Song {
   get uploadDate() {
     return new Date(this.beatSaverSongObject?.uploaded).toLocaleDateString();
   }
-  get key() {
-    return this.beatSaverSongObject?.key;
-  }
-
   asJson() {
-    // only need hash, as the rest of the data can be retrieved from cache
+    // only need id/key, as the rest of the data can be retrieved from cache
     return {
-      hash: this.hash,
+      id: this.id,
     };
   }
 
   asBplistJson() {
     return {
+      key: this.id,
       hash: this.hash,
-      levelid: `custom_level_${this.hash}`,
-      songName: this.beatSaverSongObject.metadata.name,
-      levelAuthorName: this.beatSaverSongObject.metadata.levelAuthorName,
-      difficulties: this.beatSaverSongObject.metadata.characteristics.flatMap(
-        (characteristic) =>
-          Object.entries(characteristic.difficulties)
-            .filter(([key, value]) => value !== null)
-            .map(([key, value]) => ({
-              characteristic: characteristic.name,
-              name: key,
-            }))
-      ),
+      name: this.beatSaverSongObject?.name,
+      uploader: this.beatSaverSongObject?.uploader.name,
     };
   }
 }
-
+  
 /*
 {
-    "metadata":{
-        "difficulties":{"easy":false,"normal":true,"hard":true,"expert":true,"expertPlus":false},
-        "duration":0,
-        "automapper":null,
-        "characteristics":[
+      "id": "ff9",
+      "name": "Smooth Criminal - Michael Jackson",
+      "description": "This Beat Saber track is created by Atlasik and contains only Expert+ difficulty, the expert+ difficulty is extremely hard, maybe that hard no one will even pass through it. It is possible but im not 100% sure because i didn't tried it. ( :P )",
+      "uploader": {
+        "id": 50421,
+        "name": "atlasik",
+        "uniqueSet": true,
+        "hash": "5cff0b7498cc5a672c850572",
+        "avatar": "https://www.gravatar.com/avatar/5cff0b7498cc5a672c850572?d=retro",
+        "type": "SIMPLE"
+      },
+      "metadata": {
+        "bpm": 120,
+        "duration": 257,
+        "songName": "Smooth Criminal",
+        "songSubName": "Michael Jackson",
+        "songAuthorName": "Atlasik",
+        "levelAuthorName": "Atlasik"
+      },
+      "stats": {
+        "plays": 1,
+        "downloads": 375,
+        "upvotes": 107,
+        "downvotes": 625,
+        "score": 0.1947
+      },
+      "uploaded": "2018-08-15T16:09:48Z",
+      "automapper": false,
+      "ranked": false,
+      "qualified": false,
+      "versions": [
+        {
+          "hash": "cb9f1581ff6c09130c991db8823c5953c660688f",
+          "key": "ff9",
+          "state": "Published",
+          "createdAt": "2018-08-15T16:09:48Z",
+          "sageScore": 4,
+          "diffs": [
             {
-                "name":"Standard",
-                "difficulties": {
-                    "easy":null,
-                    "normal":{"duration":355.7663269042969,"length":167,"bombs":334,"notes":375,"obstacles":9,"njs":10,"njsOffset":0},
-                    "hard":{"duration":355.7450866699219,"length":167,"bombs":306,"notes":480,"obstacles":3,"njs":10,"njsOffset":0},
-                    "expert":{"duration":355.7450866699219,"length":167,"bombs":138,"notes":662,"obstacles":3,"njs":10,"njsOffset":0},
-                    "expertPlus":null
-                }
+              "njs": 10,
+              "offset": 0,
+              "notes": 982,
+              "bombs": 197,
+              "obstacles": 81,
+              "nps": 3.838,
+              "length": 597,
+              "characteristic": "Standard",
+              "difficulty": "ExpertPlus",
+              "events": 1,
+              "chroma": false,
+              "me": false,
+              "ne": false,
+              "cinema": false,
+              "seconds": 298.5,
+              "paritySummary": {
+                "errors": 373,
+                "warns": 132,
+                "resets": 16
+              }
             }
-        ],
-        "songName":"Technologic",
-        "songSubName":"Daft Punk",
-        "songAuthorName":"Awfulnaut",
-        "levelAuthorName":"awfulnaut",
-        "bpm":127
+          ],
+          "downloadURL": "https://as.cdn.beatsaver.com/cb9f1581ff6c09130c991db8823c5953c660688f.zip",
+          "coverURL": "https://as.cdn.beatsaver.com/cb9f1581ff6c09130c991db8823c5953c660688f.jpg",
+          "previewURL": "https://as.cdn.beatsaver.com/cb9f1581ff6c09130c991db8823c5953c660688f.mp3"
+        }
+      ],
+      "createdAt": "2018-08-15T16:09:48Z",
+      "updatedAt": "2018-08-15T16:09:48Z",
+      "lastPublishedAt": "2018-08-15T16:09:48Z"
     },
-    "stats":{
-        "downloads":428745,
-        "plays":6632,
-        "downVotes":186,
-        "upVotes":9789,
-        "heat":120.6632514,
-        "rating":0.9512470277249632
-    },
-    "description":"Expert / Hard / Normal",
-    "deletedAt":null,
-    "_id":"5cff620e48229f7d88fc67a8",
-    "key":"747",
-    "name":"Technologic - Daft Punk (Update)",
-    "uploader":{"_id":"5cff0b7398cc5a672c84edac","username":"awfulnaut"},
-    "uploaded":"2018-06-30T18:30:38.000Z",
-    "hash":"831247d7d02e948e5d03622748bb130b5057023d",
-    "directDownload":"/cdn/747/831247d7d02e948e5d03622748bb130b5057023d.zip",
-    "downloadURL":"/api/download/key/747",
-    "coverURL":"/cdn/747/831247d7d02e948e5d03622748bb130b5057023d.jpg"
-}
 */
