@@ -4,7 +4,7 @@ import store from "store";
 import { makeAutoObservable } from "mobx";
 import {
   getBeatSaverMapList,
-  getMapByHash,
+  getMapById,
   searchBeatSaverMapList,
 } from "../controllers/api";
 
@@ -98,52 +98,52 @@ class BeatSaverSongCache {
   songCache = null;
 
   constructor() {
-    this.songCache = store.get("songCache") ?? {}; // hash: data
+    this.songCache = store.get("songCache") ?? {}; // id: data
   }
 
   manualAddSongData(data) {
-    this.songCache[data.hash] = data;
+    this.songCache[data.id] = data;
     store.set("songCache", this.songCache);
   }
 
-  async retrieveSongData(hash) {
-    if (!(hash in this.songCache)) {
-      const resp = await getMapByHash(hash);
-      this.songCache[hash] = resp;
+  async retrieveSongData(id) {
+    if (!(id in this.songCache)) {
+      const resp = await getMapById(id);
+      this.songCache[id] = resp;
       store.set("songCache", this.songCache);
     } // else, skip (unless needs to overwrite for some reason?)
   }
 
   // would love to use Promise.all if no rate limit :(
-  async retrieveMultipleSongData(hashes, rateLimitDelay = 500) {
-    const missingHashes = [];
-    const presentSongHashes = [];
-    for (const hash of hashes) {
-      if (hash in this.songCache) {
-        presentSongHashes.push(hash);
+  async retrieveMultipleSongData(ids, rateLimitDelay = 500) {
+    const missingIds = [];
+    const presentIds = [];
+    for (const id of ids) {
+      if (id in this.songCache) {
+        presentIds.push(id);
       } else {
-        missingHashes.push(hash);
+        missingIds.push(id);
       }
     }
-    for (const hash of missingHashes) {
+    for (const id of missingIds) {
       try {
-        const resp = await getMapByHash(hash);
-        this.songCache[hash] = resp;
-        presentSongHashes.push(hash);
+        const resp = await getMapById(id);
+        this.songCache[id] = resp;
+        presentIds.push(id);
       } catch (err) {
         console.error(err);
       }
       await new Promise((res) => setTimeout(res, rateLimitDelay)); // sleep
     }
     store.set("songCache", this.songCache);
-    return presentSongHashes;
+    return presentIds;
   }
 
-  async getSongDataByHash(hash) {
-    if (!(hash in this.songCache)) {
-      await this.retrieveSongData(hash);
+  async getSongDataById(id) {
+    if (!(id in this.songCache)) {
+      await this.retrieveSongData(id);
     }
-    return this.songCache[hash];
+    return this.songCache[id];
   }
 }
 
