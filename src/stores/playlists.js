@@ -6,7 +6,7 @@ import { JSONCrush } from "jsoncrush";
 
 import { Song } from "./songs";
 import { beatSaverSongCache } from "./beatSaver";
-import { getMapByKey } from "../controllers/api";
+import { getMapById } from "../controllers/api";
 
 export class Playlist {
   _id = null;
@@ -23,7 +23,7 @@ export class Playlist {
     this._image = savedPlaylist.image;
     this._title = savedPlaylist.title;
     this._author = savedPlaylist.author;
-    this._songs = savedPlaylist.songs.map((song) => new Song(song));
+    this._songs = savedPlaylist.songs.map((song) => new Song(song.id ? song.id : song.key, null));
     this.store = store;
   }
 
@@ -93,6 +93,7 @@ export class Playlist {
     this.store.savePlaylist(this);
   }
 
+  // TODO: will not work!
   addSongByHash(songHash) {
     this.songs.push(new Song({ hash: songHash }));
   }
@@ -104,37 +105,36 @@ export class Playlist {
      */
     let songData;
     try {
-      const resp = await getMapByKey(songKey);
-      songData = await resp.json();
+      songData = await getMapById(songKey);
     } catch (err) {
       throw Error(`Could not retreive song with key: ${songKey}`);
     }
 
     const duplicateSong = this._songs.find(
-      (song) => song.hash === songData.hash
+      (song) => song.id === songData.id
     );
     if (duplicateSong) {
       throw Error("Song already exists in playlist.");
     }
 
     beatSaverSongCache.manualAddSongData(songData);
-    this.songs.push(new Song({ hash: songData.hash }));
+    this.songs.push(new Song(songData.id, songData));
     this.store.savePlaylist(this);
 
     return songData;
   }
 
   async addSongBySongData(songData, idx = undefined) {
-    const hash = songData.hash;
+    const id = songData.id;
     if (idx === undefined) {
       idx = this._songs.length;
     }
     try {
-      if (this._songs.find((s) => s.hash === hash)) {
+      if (this._songs.find((s) => s.id === id)) {
         return; // should show some dup error
       }
       beatSaverSongCache.manualAddSongData(songData);
-      this._songs.splice(idx, 0, new Song({ hash })); // let Song handle fetching
+      this._songs.splice(idx, 0, new Song(id, songData)); // let Song handle fetching
       this.store.savePlaylist(this);
     } catch (err) {
       throw err;
@@ -256,8 +256,8 @@ class PlaylistStore {
 
   addPlaylistFromBplistData = async (data) => {
     // do preloading here for multiple songs
-    const loadedSongHashes = await beatSaverSongCache.retrieveMultipleSongData(
-      data.songs.map((song) => song.hash)
+    const loadedSongIds = await beatSaverSongCache.retrieveMultipleSongData(
+      data.songs.map((song) => song.key)
     );
     const playlist = new Playlist(
       {
@@ -265,7 +265,7 @@ class PlaylistStore {
         image: data.image,
         title: data.playlistTitle,
         author: data.playlistAuthor,
-        songs: data.songs.filter((s) => loadedSongHashes.includes(s.hash)),
+        songs: data.songs.filter((s) => loadedSongIds.includes(s.key)),
       },
       this
     );

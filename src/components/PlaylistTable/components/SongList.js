@@ -23,15 +23,15 @@ const DraggableRow = ({ idx, playlistId, song, onRemoveSongClick }) => {
   const columnsToShow = preferences.getPlaylistColumnNamesToShow();
   return (
     <Draggable
-      key={song.hash}
-      draggableId={`${playlistId}-${song.hash}`}
+      key={song.id}
+      draggableId={`${playlistId}-${song.id}`}
       index={idx}
     >
       {(provided) => (
         <Observer>
           {() => (
             <Table.Row
-              key={song.hash}
+              key={song.id}
               isSelectable
               height={42}
               ref={provided.innerRef}
@@ -88,7 +88,7 @@ export const SongList = ({ playlist }) => {
                 {() =>
                   playlist.songs.map((song, idx) => (
                     <DraggableRow
-                      key={song.hash}
+                      key={song.id}
                       idx={idx}
                       playlistId={playlist.id}
                       song={song}

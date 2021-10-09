@@ -1,6 +1,5 @@
 import { observer } from "mobx-react-lite";
 import AudioPlayer from "../../../stores/audioPlayer";
-import JSZip from "jszip";
 import mixpanel from "mixpanel-browser";
 
 import { PlayIcon, IconButton, PauseIcon } from "evergreen-ui";
@@ -11,25 +10,8 @@ const previewSong = async (song) => {
   }
   AudioPlayer.loading = true;
   AudioPlayer.previewingSongHash = song.hash;
-  const resp = await fetch("https://beatsaver.com" + song.downloadURL);
-
-  var zipFile = new JSZip();
-  const loadedZip = await zipFile.loadAsync(await resp.blob());
-  const eggFile = Object.entries(loadedZip.files).find(([key, _]) =>
-    key.includes(".egg")
-  );
-  if (eggFile) {
-    // try to play file?
-    const file = await eggFile[1].async("arraybuffer");
-    const blob = new Blob([file], { type: "audio/wav" });
-
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      AudioPlayer.playSongSrc(window.URL.createObjectURL(blob));
-      AudioPlayer.loading = false;
-    };
-    reader.readAsArrayBuffer(blob);
-  }
+  AudioPlayer.playSongSrc(song.previewURL)//window.URL.createObjectURL(blob));
+  AudioPlayer.loading = false;
 };
 
 const getButtonIcon = (songData) => {

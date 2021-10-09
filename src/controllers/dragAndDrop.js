@@ -23,9 +23,8 @@ export const onDragEnd = ({ destination, source }) => {
       (p) => p.id === destination.droppableId
     );
     const songToAdd = beatSaverBrowserStore.songsList[source.index];
-
     if (
-      destinationPlaylist.songs.find((song) => song.hash === songToAdd.hash)
+      destinationPlaylist.songs.find((song) => song.id === songToAdd.id)
     ) {
       throw Error("Song already exists in this playlist.");
     }
@@ -75,7 +74,7 @@ export const onDragEnd = ({ destination, source }) => {
     const songToMove = sourcePlaylist.songs[sourceIdx];
 
     if (
-      destinationPlaylist.songs.find((song) => song.hash === songToMove.hash)
+      destinationPlaylist.songs.find((song) => song.id === songToMove.id)
     ) {
       throw Error("Song already exists in this playlist.");
     }
