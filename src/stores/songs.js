@@ -66,6 +66,7 @@ export class Song {
   get duration() {
     var date = new Date(0);
     let duration = this.beatSaverSongObject?.metadata.duration;
+    if (!duration) return "?"
     date.setSeconds(duration); // specify value for SECONDS here
     var timeString = date.toISOString().substr(14, 5);
     return timeString;
