@@ -93,7 +93,7 @@ export class Playlist {
     this.store.savePlaylist(this);
   }
 
-  // TODO: will not work!
+  // TODO: will not work! probbaly need to fetch by hash, and use id
   addSongByHash(songHash) {
     this.songs.push(new Song({ hash: songHash }));
   }
@@ -256,16 +256,20 @@ class PlaylistStore {
 
   addPlaylistFromBplistData = async (data) => {
     // do preloading here for multiple songs
-    const loadedSongIds = await beatSaverSongCache.retrieveMultipleSongData(
-      data.songs.map((song) => song.key)
+    const songKeysToLoad = data.songs.filter(song => song.key).map(s => s.key)
+    const songHashesToLoad = data.songs.filter(song => song.hash && !song.key).map(s => s.hash)
+    const songsFound = await beatSaverSongCache.retrieveMultipleSongData(
+      songKeysToLoad,
+      songHashesToLoad
     );
+    console.log(songsFound, 'foundeded')
     const playlist = new Playlist(
       {
         id: this.getNewId(),
         image: data.image,
         title: data.playlistTitle,
         author: data.playlistAuthor,
-        songs: data.songs.filter((s) => loadedSongIds.includes(s.key)),
+        songs: songsFound
       },
       this
     );
