@@ -23,7 +23,7 @@ export class Playlist {
     this._image = savedPlaylist.image;
     this._title = savedPlaylist.title;
     this._author = savedPlaylist.author;
-    this._songs = savedPlaylist.songs.map((song) => new Song(song.id, null));
+    this._songs = savedPlaylist.songs.map((song) => new Song(song.id ? song.id : song.key, null));
     this.store = store;
   }
 
@@ -258,7 +258,7 @@ class PlaylistStore {
   addPlaylistFromBplistData = async (data) => {
     // do preloading here for multiple songs
     const loadedSongIds = await beatSaverSongCache.retrieveMultipleSongData(
-      data.songs.map((song) => song.id)
+      data.songs.map((song) => song.key)
     );
     const playlist = new Playlist(
       {
@@ -266,7 +266,7 @@ class PlaylistStore {
         image: data.image,
         title: data.playlistTitle,
         author: data.playlistAuthor,
-        songs: data.songs.filter((s) => loadedSongIds.includes(s.id)),
+        songs: data.songs.filter((s) => loadedSongIds.includes(s.key)),
       },
       this
     );

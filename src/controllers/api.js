@@ -3,7 +3,7 @@ export const getMapByHash = async (hash) => {
 };
 
 export const getMapById = async (id) => {
-  return await fetch(`https://beatsaver.com/api/maps/id/${id}`);
+  return (await fetch(`https://beatsaver.com/api/maps/id/${id}`)).json();
 };
 
 export const getBeatSaverMapList = async (page, type) => {
