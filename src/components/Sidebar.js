@@ -172,6 +172,7 @@ export const Sidebar = () => {
         <Heading>Advanced</Heading>
         <div style={{ marginTop: 10 }}>
           <Button
+            disabled
             onClick={() => {
               mixpanel.track("importPlayerDataButton", {
                 event_category: "sidebarConfig",

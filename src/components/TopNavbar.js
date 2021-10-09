@@ -64,6 +64,11 @@ export const Navbar = () => {
         <Pane margin={40}>
           <Heading>Things to know</Heading>
           <Paragraph marginTop={10}>
+            UPDATE: Due to BeatSaver's new API changes, you WILL need to clear your
+            browser cache/application data in order to ... crashing. Apologies for
+            the inconvenience.
+          </Paragraph >
+          <Paragraph marginTop={10}>
             Any changes you make will be saved automatically, so you don't have
             to worry about losing data when refreshing. (if it happens, let me
             know so I can fix the bug)
