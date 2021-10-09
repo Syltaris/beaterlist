@@ -51,7 +51,7 @@ const DeepPlaylistImportDialog = () => {
       if (!!playlistJson) {
         setLoading(true);
         await beatSaverSongCache.retrieveMultipleSongData(
-          playlistJson.songs.map((s) => s.hash)
+          playlistJson.songs.map((s) => s.id)
         );
         setLoading(false);
 
