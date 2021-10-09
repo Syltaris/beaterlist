@@ -104,6 +104,7 @@ export class Song {
       hash: this.hash,
       name: this.beatSaverSongObject?.name,
       uploader: this.beatSaverSongObject?.uploader.name,
+      customData: this.beatSaverSongObject?.customData,
     };
   }
 }

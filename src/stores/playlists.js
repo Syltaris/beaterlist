@@ -105,8 +105,7 @@ export class Playlist {
      */
     let songData;
     try {
-      const resp = await getMapById(songKey);
-      songData = await resp.json();
+      songData = await getMapById(songKey);
     } catch (err) {
       throw Error(`Could not retreive song with key: ${songKey}`);
     }
