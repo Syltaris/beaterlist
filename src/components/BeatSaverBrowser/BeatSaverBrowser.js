@@ -146,7 +146,7 @@ const BeatSaverBrowser = () => {
                             flexGrow={0}
                             flexShrink={0}
                           >
-                            <PreviewSongButton songData={songData} />
+                            <PreviewSongButton songData={new Song(songData.id, songData)} />
                           </Table.Cell>
                           {columnsToShow.map((key) =>
                             getTableCellForCol(
