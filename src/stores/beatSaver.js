@@ -5,8 +5,10 @@ import { makeAutoObservable } from "mobx";
 import {
   getBeatSaverMapList,
   getMapById,
+  getMapByHash,
   searchBeatSaverMapList,
 } from "../controllers/api";
+import { Song } from "./songs";
 
 export const beatSaverBrowserCategories = [
   "plays",
@@ -108,18 +110,19 @@ class BeatSaverSongCache {
   async retrieveSongData(id) {
     if (!(id in this.songCache)) {
       const resp = await getMapById(id);
+      if (resp.error) return
       this.songCache[id] = resp;
       store.set("songCache", this.songCache);
     } // else, skip (unless needs to overwrite for some reason?)
   }
 
   // would love to use Promise.all if no rate limit :(
-  async retrieveMultipleSongData(ids, rateLimitDelay = 500) {
+  async retrieveMultipleSongData(ids, hashes, rateLimitDelay = 500) {
+    const songsFound = []
     const missingIds = [];
-    const presentIds = [];
     for (const id of ids) {
       if (id in this.songCache) {
-        presentIds.push(id);
+        songsFound.push(new Song(id, this.songCache[id]));
       } else {
         missingIds.push(id);
       }
@@ -127,15 +130,30 @@ class BeatSaverSongCache {
     for (const id of missingIds) {
       try {
         const resp = await getMapById(id);
+        if(resp.error) continue
         this.songCache[id] = resp;
-        presentIds.push(id);
+        songsFound.push(new Song(id, resp));
       } catch (err) {
         console.error(err);
       }
       await new Promise((res) => setTimeout(res, rateLimitDelay)); // sleep
     }
+    // smelly, but hashes will always miss
+    for (const hash of hashes) {
+      try {
+        const resp = await getMapByHash(hash);
+        if(resp.error) continue
+        this.songCache[resp.id] = resp;
+        songsFound.push(new Song(resp.id, resp));
+      } catch (err) {
+        console.error(err);
+        console.log('yas is error')
+      }
+      await new Promise((res) => setTimeout(res, rateLimitDelay)); // sleep
+    }
+
     store.set("songCache", this.songCache);
-    return presentIds;
+    return songsFound
   }
 
   async getSongDataById(id) {
