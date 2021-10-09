@@ -129,14 +129,14 @@ const BeatSaverBrowser = () => {
                 {() =>
                   songStore.songsList.map((songData, idx) => (
                     <Draggable
-                      key={songData.hash}
-                      draggableId={`browser-${songData.hash}`}
+                      key={songData.id}
+                      draggableId={`browser-${songData.id}`}
                       index={idx}
                     >
                       {(provided, snapshot) => (
                         <Table.Row
                           height={40}
-                          key={songData.hash}
+                          key={songData.id}
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
@@ -151,7 +151,7 @@ const BeatSaverBrowser = () => {
                           {columnsToShow.map((key) =>
                             getTableCellForCol(
                               key,
-                              new Song(songData.hash, songData)
+                              new Song(songData.id, songData)
                             )
                           )}
                         </Table.Row>

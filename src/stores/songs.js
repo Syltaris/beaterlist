@@ -5,9 +5,9 @@ export class Song {
   _id = null; // unique id
   beatSaverSongObject = undefined; // data object retrieve from beat-saver server
 
-  constructor(savedSong, songData = null) {
+  constructor(id, songData = null) {
     makeAutoObservable(this);
-    this._id = savedSong.id;
+    this._id = id;
     if (songData === null) {
       beatSaverSongCache.getSongDataById(this.id).then((songData) => {
         this.beatSaverSongObject = songData;
@@ -27,16 +27,16 @@ export class Song {
   get id() {
     return this.beatSaverSongObject?.id;
   }
+  get key() {
+    return this.id // for simplicity sake, since both are the same
+  }
   get hash(){
     // not too sure, should be by the latest version's song hash
     return this.beatSaverSongObject?.versions[0].hash
   }
 
   get coverURL() {
-    return (
-      this.beatSaverSongObject &&
-      "https://beatsaver.com" + this.beatSaverSongObject?.coverURL
-    );
+    return  this.beatSaverSongObject?.versions[0].coverURL
   }
   get name() {
     return this.beatSaverSongObject?.metadata.songName;
@@ -72,14 +72,14 @@ export class Song {
     return this.beatSaverSongObject?.stats.plays;
   }
   get upvotes() {
-    return this.beatSaverSongObject?.stats.upVotes;
+    return this.beatSaverSongObject?.stats.upvotes;
   }
   get downvotes() {
-    return this.beatSaverSongObject?.stats.downVotes;
+    return this.beatSaverSongObject?.stats.downvotes;
   }
   get rating() {
     return Number.parseFloat(
-      this.beatSaverSongObject?.stats.rating * 100 ?? 0.0
+      this.beatSaverSongObject?.stats.score * 100 ?? 0.0
     ).toPrecision(2);
   }
   get uploadDate() {
