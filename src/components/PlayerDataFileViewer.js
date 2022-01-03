@@ -41,12 +41,13 @@ const PlayerDataFileViewer = ({ jsonFile }) => {
                 );
 
               // pre-fetch songData
-              const presentSongHashes =
-                await beatSaverSongCache.retrieveMultipleSongData(songHashes);
+              const songsFetched =
+                await beatSaverSongCache.retrieveMultipleSongData(
+                  [],
+                  songHashes
+                );
 
-              songHashes
-                .filter((hash) => presentSongHashes.includes(hash))
-                .forEach((hash) => playlist.addSongByHash(hash));
+              songsFetched.forEach((song) => playlist.insertSong(song));
               playlistStore.savePlaylist(playlist);
               setLoading(false);
               toaster.success("Favourites loaded into playlist successfully.");

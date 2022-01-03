@@ -10,9 +10,7 @@ import {
 } from "../controllers/api";
 import { Song } from "./songs";
 
-export const beatSaverBrowserCategories = [
-  "plays",
-];
+export const beatSaverBrowserCategories = ["plays", "latest"];
 
 // beat saver server songs
 class BeatSaverBrowserStore {
@@ -110,15 +108,15 @@ class BeatSaverSongCache {
   async retrieveSongData(id) {
     if (!(id in this.songCache)) {
       const resp = await getMapById(id);
-      if (resp.error) return
+      if (resp.error) return;
       this.songCache[id] = resp;
       store.set("songCache", this.songCache);
     } // else, skip (unless needs to overwrite for some reason?)
   }
 
   // would love to use Promise.all if no rate limit :(
-  async retrieveMultipleSongData(ids, hashes, rateLimitDelay = 500) {
-    const songsFound = []
+  async retrieveMultipleSongData(ids = [], hashes, rateLimitDelay = 500) {
+    const songsFound = [];
     const missingIds = [];
     for (const id of ids) {
       if (id in this.songCache) {
@@ -130,9 +128,9 @@ class BeatSaverSongCache {
     for (const id of missingIds) {
       try {
         const resp = await getMapById(id);
-        if(resp.error) continue
+        if (resp.error) continue;
         this.songCache[id] = resp;
-        songsFound.push(new Song(id, resp));
+        songsFound.push(new Song(id, this.songCache[id]));
       } catch (err) {
         console.error(err);
       }
@@ -142,18 +140,17 @@ class BeatSaverSongCache {
     for (const hash of hashes) {
       try {
         const resp = await getMapByHash(hash);
-        if(resp.error) continue
+        if (resp.error) continue;
         this.songCache[resp.id] = resp;
-        songsFound.push(new Song(resp.id, resp));
+        songsFound.push(new Song(resp.id, this.songCache[resp.id]));
       } catch (err) {
         console.error(err);
-        console.log('yas is error')
       }
       await new Promise((res) => setTimeout(res, rateLimitDelay)); // sleep
     }
 
     store.set("songCache", this.songCache);
-    return songsFound
+    return songsFound;
   }
 
   async getSongDataById(id) {
