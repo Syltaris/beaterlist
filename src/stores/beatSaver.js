@@ -115,7 +115,7 @@ class BeatSaverSongCache {
   }
 
   // would love to use Promise.all if no rate limit :(
-  async retrieveMultipleSongData(ids, hashes, rateLimitDelay = 500) {
+  async retrieveMultipleSongData(ids = [], hashes, rateLimitDelay = 500) {
     const songsFound = [];
     const missingIds = [];
     for (const id of ids) {
@@ -130,7 +130,7 @@ class BeatSaverSongCache {
         const resp = await getMapById(id);
         if (resp.error) continue;
         this.songCache[id] = resp;
-        songsFound.push(new Song(id, resp));
+        songsFound.push(new Song(id, this.songCache[id]));
       } catch (err) {
         console.error(err);
       }
@@ -142,10 +142,9 @@ class BeatSaverSongCache {
         const resp = await getMapByHash(hash);
         if (resp.error) continue;
         this.songCache[resp.id] = resp;
-        songsFound.push(new Song(resp.id, resp));
+        songsFound.push(new Song(resp.id, this.songCache[resp.id]));
       } catch (err) {
         console.error(err);
-        console.log("yas is error");
       }
       await new Promise((res) => setTimeout(res, rateLimitDelay)); // sleep
     }
