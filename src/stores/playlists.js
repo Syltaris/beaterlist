@@ -145,7 +145,7 @@ export class Playlist {
         return; // should show some dup error
       }
       beatSaverSongCache.manualAddSongData(songData);
-      this.insertSongAt(new Song(id, songData), idx);
+      this.insertSong(new Song(id, songData), idx);
       this.store.savePlaylist(this);
     } catch (err) {
       throw err;
